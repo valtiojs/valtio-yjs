@@ -1,0 +1,49 @@
+{
+  "name": "valtio-yjs",
+  "description": "Valtio Yjs two-way binding",
+  "version": "0.0.1",
+  "author": "Daishi Kato",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dai-shi/valtio-yjs.git"
+  },
+  "source": "./src/index.ts",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.modern.js",
+  "types": "./dist/src/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "compile": "microbundle build -f modern,umd --jsx React.createElement",
+    "test": "run-s eslint tsc-test jest",
+    "eslint": "eslint --ext .js,.ts,.tsx --ignore-pattern dist .",
+    "jest": "jest --preset ts-jest/presets/js-with-ts",
+    "tsc-test": "tsc --project . --noEmit"
+  },
+  "keywords": [
+    "valtio",
+    "yjs",
+    "crdt"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "valtio": "^1.0.4",
+    "yjs": "^13.5.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.22",
+    "@typescript-eslint/eslint-plugin": "^4.19.0",
+    "@typescript-eslint/parser": "^4.19.0",
+    "eslint": "^7.22.0",
+    "eslint-config-airbnb-base": "14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "jest": "^26.6.3",
+    "microbundle": "^0.13.0",
+    "npm-run-all": "^4.1.5",
+    "ts-jest": "^26.5.4",
+    "typescript": "^4.2.3"
+  }
+}
