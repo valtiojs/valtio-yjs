@@ -58,7 +58,7 @@ describe('bindProxyAndYMap', () => {
     expect(m.get('foo').get('bar')).toBe('b');
   });
 
-  it.skip('nested map (from y.map)', async () => {
+  it('nested map (from y.map)', async () => {
     const doc = new Y.Doc();
     const p = proxy<{ foo?: { bar?: string } }>({});
     const m = doc.getMap('map');

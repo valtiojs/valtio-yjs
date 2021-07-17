@@ -1,73 +1,101 @@
-import { subscribe, snapshot } from 'valtio/vanilla';
+import { proxy, subscribe } from 'valtio/vanilla';
 import * as Y from 'yjs';
+import deepEqual from 'fast-deep-equal';
 
 const isObject = (x: unknown): x is Record<string, unknown> => (
   typeof x === 'object' && x !== null
 );
 
-const subscribers = new WeakMap();
-
 export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
-  const y2p = () => {
-    y.forEach((v, k) => {
-      if (v instanceof Y.Array) {
-        throw new Error('TODO');
+  // initialize from y
+  y.forEach((v, k) => {
+    if (v instanceof Y.Array) {
+      const vv = proxy(v.toJSON());
+      bindProxyAndYArray(vv, v);
+      p[k] = vv as unknown as T;
+    } else if (v instanceof Y.Map) {
+      const vv = proxy(v.toJSON());
+      bindProxyAndYMap(vv, v);
+      p[k] = vv as unknown as T;
+    } else if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+      p[k] = v;
+    } else {
+      throw new Error('unsupported y type');
+    }
+  });
+
+  // initialize from p
+  Object.keys(p).forEach((k) => {
+    const v = p[k];
+    if (Array.isArray(v)) {
+      const vv = new Y.Array();
+      bindProxyAndYArray(v, vv);
+      y.set(k, vv as unknown as T);
+    } else if (isObject(v)) {
+      const vv = new Y.Map();
+      bindProxyAndYMap(v, vv);
+      y.set(k, vv as unknown as T);
+    } else if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+      y.set(k, v);
+    } else {
+      throw new Error('unsupported p type');
+    }
+  });
+
+  // subscribe y
+  y.observe((event) => {
+    event.keysChanged.forEach((k) => {
+      const v = y.get(k);
+      if (v === undefined) {
+        delete p[k];
+      } else if (v instanceof Y.Array) {
+        const vv = proxy(v.toJSON());
+        if (!deepEqual(p[k], vv)) {
+          bindProxyAndYArray(vv, v);
+          p[k] = vv as unknown as T;
+        }
       } else if (v instanceof Y.Map) {
-        throw new Error('TODO');
-      } else if (v instanceof Y.AbstractType) {
-        throw new Error('unsupported y type');
-      } else {
-        const vv = p[k];
-        subscribers.get(vv as any)?.();
+        const vv = proxy(v.toJSON());
+        if (!deepEqual(p[k], vv)) {
+          bindProxyAndYMap(vv, v);
+          p[k] = vv as unknown as T;
+        }
+      } else if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
         p[k] = v;
+      } else {
+        throw new Error('unsupported y type');
       }
     });
-  };
-  let prevSnap = snapshot(p);
-  const p2y = (force?: boolean) => {
-    const nextSnap = snapshot(p);
-    Object.keys(p).forEach((k) => {
-      if (!force && Object.is(prevSnap[k], nextSnap[k])) {
+  });
+
+  // subscribe p
+  subscribe(p, (ops) => {
+    ops.forEach((op) => {
+      const path = op[1];
+      if (path.length !== 1) {
         return;
       }
-      const v = p[k];
-      const vv = y.get(k);
-      if (Array.isArray(v)) {
-        if (vv instanceof Y.Array) {
+      const k = path[0] as string;
+      if (op[0] === 'delete') {
+        y.delete(k);
+      } else if (op[0] === 'set') {
+        const v = p[k];
+        if (Array.isArray(v)) {
+          const vv = new Y.Array();
           bindProxyAndYArray(v, vv);
-        } else {
-          subscribers.get(vv as any)?.();
-          const a = new Y.Array();
-          bindProxyAndYArray(v, a);
-          y.set(k, a as any);
-        }
-      } else if (isObject(v)) {
-        if (vv instanceof Y.Map) {
+          y.set(k, vv as unknown as T);
+        } else if (isObject(v)) {
+          const vv = new Y.Map();
           bindProxyAndYMap(v, vv);
+          y.set(k, vv as unknown as T);
+        } else if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+          y.set(k, v);
         } else {
-          subscribers.get(vv as any)?.();
-          const m = new Y.Map() as any;
-          bindProxyAndYMap(v, m);
-          y.set(k, m);
+          throw new Error('unsupported p type');
         }
-      } else if (!Object.is(v, vv)) {
-        subscribers.get(vv as any)?.();
-        y.set(k, v);
       }
     });
-    prevSnap = nextSnap;
-  };
-  y.observe(y2p);
-  const unobserve = () => y.unobserve(y2p);
-  subscribers.set(y, unobserve);
-  y2p();
-  const unsubscribe = subscribe(p, p2y);
-  subscribers.set(p, unsubscribe);
-  p2y(true);
-};
-
-export const unbind = (x: unknown) => {
-  throw new Error(`TODO ${x}`);
+  });
 };
 
 export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
