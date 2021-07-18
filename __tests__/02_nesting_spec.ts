@@ -29,6 +29,7 @@ describe('https://codesandbox.io/s/ni1fk', () => {
     expect(m2.get('foo')).toBe('a');
     expect(p2.foo).toBe('a');
 
+    await Promise.resolve();
     p1.foo = 'b';
     await Promise.resolve();
     expect(p1.foo).toBe('b');
@@ -63,6 +64,7 @@ describe('https://codesandbox.io/s/ni1fk', () => {
     expect(m2.get('foo').get('bar')).toBe('a');
     expect(p2.foo?.bar).toBe('a');
 
+    await Promise.resolve();
     p1.foo.bar = 'b';
     await Promise.resolve();
     expect(p1.foo.bar).toBe('b');
