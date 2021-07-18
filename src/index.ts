@@ -83,13 +83,19 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       } else if (op[0] === 'set') {
         const pv /* proxy value */ = p[k];
         if (Array.isArray(pv)) {
-          const yv = new Y.Array();
-          bindProxyAndYArray(pv, yv);
-          y.set(k, yv as unknown as T);
+          const prev = y.get(k);
+          if (!(prev instanceof Y.Array) || !deepEqual(prev.toJSON(), pv)) {
+            const yv = new Y.Array();
+            bindProxyAndYArray(pv, yv);
+            y.set(k, yv as unknown as T);
+          }
         } else if (isObject(pv)) {
-          const yv = new Y.Map();
-          bindProxyAndYMap(pv, yv);
-          y.set(k, yv as unknown as T);
+          const prev = y.get(k);
+          if (!(prev instanceof Y.Map) || !deepEqual(prev.toJSON(), pv)) {
+            const yv = new Y.Map();
+            bindProxyAndYMap(pv, yv);
+            y.set(k, yv as unknown as T);
+          }
         } else if (typeof pv === 'string' || typeof pv === 'number' || typeof pv === 'boolean') {
           y.set(k, pv);
         } else {
