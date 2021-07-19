@@ -105,13 +105,13 @@ describe('bindProxyAndYArray', () => {
     bindProxyAndYArray(p, a);
 
     a.push([20]);
-    expect(p[5]).toBe(20);
-    expect(a.get(5)).toBe(20);
+    expect(a.get(4)).toBe(20);
+    expect(p[4]).toBe(20);
 
     p.push(21);
     await Promise.resolve();
-    expect(p[6]).toBe(21);
-    expect(a.get(6)).toBe(21);
+    expect(p[5]).toBe(21);
+    expect(a.get(5)).toBe(21);
 
     // TODO
     // pop
