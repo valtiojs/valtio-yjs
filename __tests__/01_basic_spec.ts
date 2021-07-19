@@ -1,6 +1,6 @@
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bindProxyAndYMap } from '../src/index';
+import { bindProxyAndYMap, bindProxyAndYArray } from '../src/index';
 
 describe('bindProxyAndYMap', () => {
   it('simple map', async () => {
@@ -76,5 +76,50 @@ describe('bindProxyAndYMap', () => {
     await Promise.resolve();
     expect(p?.foo?.bar).toBe('b');
     expect(m.get('foo').get('bar')).toBe('b');
+  });
+});
+
+describe('bindProxyAndYArray', () => {
+  it.only('simple array', async () => {
+    const doc = new Y.Doc();
+    const p = proxy<string[]>([]);
+    const a = doc.getArray<string>('arr');
+
+    bindProxyAndYArray(p, a);
+    expect(p[0]).toBe(undefined);
+    expect(a.get(0)).toBe(undefined);
+
+    a.push(['a']);
+    expect(p[0]).toBe('a');
+
+    p.push('b');
+    await Promise.resolve();
+    expect(a.get(1)).toBe('b');
+  });
+
+  it('simple array with various operations', async () => {
+    const doc = new Y.Doc();
+    const p = proxy([10, 11, 12, 13]);
+    const a = doc.getArray<number>('arr');
+
+    bindProxyAndYArray(p, a);
+
+    a.push([20]);
+    expect(p[5]).toBe(20);
+    expect(a.get(5)).toBe(20);
+
+    p.push(21);
+    await Promise.resolve();
+    expect(p[6]).toBe(21);
+    expect(a.get(6)).toBe(21);
+
+    // TODO
+    // pop
+    // unshift
+    // shift
+    // [index]
+    // splice with one
+    // splice to remove
+    // splice to insert
   });
 });
