@@ -1,11 +1,13 @@
 {
   "parser": "@typescript-eslint/parser",
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "prettier"
   ],
   "extends": [
     "plugin:@typescript-eslint/recommended",
-    "airbnb-base"
+    "airbnb-base",
+    "plugin:prettier/recommended"
   ],
   "env": {
     "es2021": true

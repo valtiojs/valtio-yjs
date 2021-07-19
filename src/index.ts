@@ -2,9 +2,8 @@ import { proxy, subscribe } from 'valtio/vanilla';
 import * as Y from 'yjs';
 import deepEqual from 'fast-deep-equal';
 
-const isObject = (x: unknown): x is Record<string, unknown> => (
-  typeof x === 'object' && x !== null
-);
+const isObject = (x: unknown): x is Record<string, unknown> =>
+  typeof x === 'object' && x !== null;
 
 export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
   const setYValueToP = (yv: T, k: string) => {
@@ -22,7 +21,11 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
         bindProxyAndYMap(pv, yv);
         p[k] = pv as unknown as T;
       }
-    } else if (typeof yv === 'string' || typeof yv === 'number' || typeof yv === 'boolean') {
+    } else if (
+      typeof yv === 'string' ||
+      typeof yv === 'number' ||
+      typeof yv === 'boolean'
+    ) {
       p[k] = yv;
     } else {
       throw new Error('unsupported y type');
@@ -44,7 +47,11 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
         bindProxyAndYMap(pv, yv);
         y.set(k, yv as unknown as T);
       }
-    } else if (typeof pv === 'string' || typeof pv === 'number' || typeof pv === 'boolean') {
+    } else if (
+      typeof pv === 'string' ||
+      typeof pv === 'number' ||
+      typeof pv === 'boolean'
+    ) {
       y.set(k, pv);
     } else {
       throw new Error('unsupported p type');
