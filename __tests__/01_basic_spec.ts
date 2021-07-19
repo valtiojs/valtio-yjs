@@ -80,7 +80,7 @@ describe('bindProxyAndYMap', () => {
 });
 
 describe('bindProxyAndYArray', () => {
-  it.only('simple array', async () => {
+  it('simple array', async () => {
     const doc = new Y.Doc();
     const p = proxy<string[]>([]);
     const a = doc.getArray<string>('arr');

@@ -99,44 +99,63 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
 
 type Op = [op: string, path: string[], value1: unknown, value2: unknown];
 const guessInsertOps = (ops: Op[]): Op[] => {
-  return ops;
-  /*
-  Array [
-    Array [
-      "set",
-      Array [
-        "3",
-      ],
-      "c",
-      undefined,
-    ],
-    Array [
-      "set",
-      Array [
-        "2",
-      ],
-      "b",
-      "c",
-    ],
-    Array [
-      "set",
-      Array [
-        "1",
-      ],
-      "a",
-      "b",
-    ],
-    Array [
-      "set",
-      Array [
-        "0",
-      ],
-      "d",
-      "a",
-    ],
-  ],
-*/
+  const newOps = [...ops];
+  let i = 0;
+  let startPos = -1;
+  let startIdx = -1;
+  const replaceWithInsert = () => {
+    if (i - 1 > startPos) {
+      newOps.splice(startPos, i - startPos, [
+        'insert',
+        [String(startIdx - (i - 1 - startPos))],
+        newOps[i - 1][2],
+        undefined,
+      ]);
+    }
+  };
+  while (i < newOps.length) {
+    if (startPos >= 0) {
+      if (
+        newOps[i][0] === 'set' &&
+        newOps[i][1].length === 1 &&
+        newOps[i][1][0] === String(startIdx - (i - startPos)) &&
+        newOps[i][3] === newOps[i - 1][2]
+      ) {
+        // continue
+      } else {
+        replaceWithInsert();
+        startPos = -1;
+        startIdx = -1;
+      }
+    } else if (
+      newOps[i][0] === 'set' &&
+      newOps[i][1].length === 1 &&
+      newOps[i][3] === undefined
+    ) {
+      const idx = Number(newOps[i][1][0]);
+      if (Number.isFinite(idx)) {
+        startPos = i;
+        startIdx = idx;
+      }
+    }
+    i += 1;
+  }
+  if (startPos >= 0) {
+    replaceWithInsert();
+  }
+  return newOps;
 };
+
+/*
+console.log(
+  guessInsertOps([
+    ['set', ['3'], 'c', undefined],
+    ['set', ['2'], 'b', 'c'],
+    ['set', ['1'], 'a', 'b'],
+    ['set', ['0'], 'd', 'a'],
+  ]),
+);
+*/
 
 export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
   const insertPValueToY = (pv: T, i: number) => {
@@ -201,6 +220,9 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
 
   // subscribe p
   subscribe(p, (ops) => {
+    if (p.length === y.length) {
+      return;
+    }
     // console.log(ops);
     guessInsertOps(ops as Op[]).forEach((op) => {
       const path = op[1];
@@ -212,7 +234,9 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
         if (op[0] === 'delete') {
           y.delete(i);
         } else if (op[0] === 'set') {
-          y.delete(i);
+          if (op[3] !== undefined) {
+            y.delete(i);
+          }
           const pv = p[i];
           insertPValueToY(pv, i);
         } else if (op[0] === 'insert') {
@@ -225,6 +249,9 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
 
   // subscribe y
   y.observe((event) => {
+    if (y.length === p.length) {
+      return;
+    }
     // console.log(JSON.stringify(event.changes));
     let retain: number | undefined;
     event.changes.delta.forEach((item) => {
