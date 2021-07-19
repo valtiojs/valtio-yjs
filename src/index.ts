@@ -6,32 +6,6 @@ const isObject = (x: unknown): x is Record<string, unknown> =>
   typeof x === 'object' && x !== null;
 
 export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
-  const setYValueToP = (yv: T, k: string) => {
-    if (yv instanceof Y.Array) {
-      const json = yv.toJSON();
-      if (!deepEqual(p[k], json)) {
-        const pv = proxy(json);
-        bindProxyAndYArray(pv, yv);
-        p[k] = pv as unknown as T;
-      }
-    } else if (yv instanceof Y.Map) {
-      const json = yv.toJSON();
-      if (!deepEqual(p[k], json)) {
-        const pv = proxy(json);
-        bindProxyAndYMap(pv, yv);
-        p[k] = pv as unknown as T;
-      }
-    } else if (
-      typeof yv === 'string' ||
-      typeof yv === 'number' ||
-      typeof yv === 'boolean'
-    ) {
-      p[k] = yv;
-    } else {
-      throw new Error('unsupported y type');
-    }
-  };
-
   const setPValueToY = (pv: T, k: string) => {
     if (Array.isArray(pv)) {
       const prev = y.get(k);
@@ -58,8 +32,31 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
     }
   };
 
-  // initialize from y
-  y.forEach(setYValueToP);
+  const setYValueToP = (yv: T, k: string) => {
+    if (yv instanceof Y.Array) {
+      const json = yv.toJSON();
+      if (!deepEqual(p[k], json)) {
+        const pv = proxy(json);
+        bindProxyAndYArray(pv, yv);
+        p[k] = pv as unknown as T;
+      }
+    } else if (yv instanceof Y.Map) {
+      const json = yv.toJSON();
+      if (!deepEqual(p[k], json)) {
+        const pv = proxy(json);
+        bindProxyAndYMap(pv, yv);
+        p[k] = pv as unknown as T;
+      }
+    } else if (
+      typeof yv === 'string' ||
+      typeof yv === 'number' ||
+      typeof yv === 'boolean'
+    ) {
+      p[k] = yv;
+    } else {
+      throw new Error('unsupported y type');
+    }
+  };
 
   // initialize from p
   Object.keys(p).forEach((k) => {
@@ -67,17 +64,8 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
     setPValueToY(pv, k);
   });
 
-  // subscribe y
-  y.observe((event) => {
-    event.keysChanged.forEach((k) => {
-      const yv = y.get(k);
-      if (yv === undefined) {
-        delete p[k];
-      } else {
-        setYValueToP(yv, k);
-      }
-    });
-  });
+  // initialize from y
+  y.forEach(setYValueToP);
 
   // subscribe p
   subscribe(p, (ops) => {
@@ -92,6 +80,18 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       } else if (op[0] === 'set') {
         const pv = p[k];
         setPValueToY(pv, k);
+      }
+    });
+  });
+
+  // subscribe y
+  y.observe((event) => {
+    event.keysChanged.forEach((k) => {
+      const yv = y.get(k);
+      if (yv === undefined) {
+        delete p[k];
+      } else {
+        setYValueToP(yv, k);
       }
     });
   });
