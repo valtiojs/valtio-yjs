@@ -86,15 +86,17 @@ describe('bindProxyAndYArray', () => {
     const a = doc.getArray<string>('arr');
 
     bindProxyAndYArray(p, a);
-    expect(p[0]).toBe(undefined);
-    expect(a.get(0)).toBe(undefined);
+    expect(p).toEqual([]);
+    expect(a.toJSON()).toEqual([]);
 
     a.push(['a']);
-    expect(p[0]).toBe('a');
+    expect(p).toEqual(['a']);
+    expect(a.toJSON()).toEqual(['a']);
 
     p.push('b');
     await Promise.resolve();
-    expect(a.get(1)).toBe('b');
+    expect(a.toJSON()).toEqual(['a', 'b']);
+    expect(p).toEqual(['a', 'b']);
   });
 
   it('simple array with various operations', async () => {
@@ -105,16 +107,24 @@ describe('bindProxyAndYArray', () => {
     bindProxyAndYArray(p, a);
 
     a.push([20]);
-    expect(a.get(4)).toBe(20);
-    expect(p[4]).toBe(20);
+    expect(a.toJSON()).toEqual([10, 11, 12, 13, 20]);
+    expect(p).toEqual([10, 11, 12, 13, 20]);
 
     p.push(21);
     await Promise.resolve();
-    expect(p[5]).toBe(21);
-    expect(a.get(5)).toBe(21);
+    expect(p).toEqual([10, 11, 12, 13, 20, 21]);
+    expect(a.toJSON()).toEqual([10, 11, 12, 13, 20, 21]);
+
+    a.delete(5, 1);
+    expect(a.toJSON()).toEqual([10, 11, 12, 13, 20]);
+    expect(p).toEqual([10, 11, 12, 13, 20]);
+
+    p.pop();
+    await Promise.resolve();
+    expect(p).toEqual([10, 11, 12, 13]);
+    expect(a.toJSON()).toEqual([10, 11, 12, 13]);
 
     // TODO
-    // pop
     // unshift
     // shift
     // [index]

@@ -232,10 +232,10 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
       const i = Number(path[0]);
       if (Number.isFinite(i)) {
         if (op[0] === 'delete') {
-          y.delete(i);
+          y.delete(i, 1);
         } else if (op[0] === 'set') {
           if (op[3] !== undefined) {
-            y.delete(i);
+            y.delete(i, 1);
           }
           const pv = p[i];
           insertPValueToY(pv, i);
