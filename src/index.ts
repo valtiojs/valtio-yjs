@@ -222,11 +222,11 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
   subscribe(p, (ops) => {
     if (
       p.length === y.length &&
-      !ops.every(
-        (op) =>
-          op[1].length !== 1 ||
-          (op[0] === 'set' && op[2] !== undefined && op[3] !== undefined),
-      )
+      p.every((pv, i) => {
+        const yv = y.get(i);
+        const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
+        return deepEqual(pv, json);
+      })
     ) {
       return;
     }

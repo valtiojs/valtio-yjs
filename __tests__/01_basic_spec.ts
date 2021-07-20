@@ -160,6 +160,11 @@ describe('bindProxyAndYArray', () => {
     expect(p).toEqual([10, 11, 98, 13]);
     expect(a.toJSON()).toEqual([10, 11, 98, 13]);
 
+    p.splice(2, 1, 97);
+    await Promise.resolve();
+    expect(p).toEqual([10, 11, 97, 13]);
+    expect(a.toJSON()).toEqual([10, 11, 97, 13]);
+
     // TODO
     // splice with one
     // splice to remove
