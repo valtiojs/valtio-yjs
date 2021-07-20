@@ -165,9 +165,14 @@ describe('bindProxyAndYArray', () => {
     expect(p).toEqual([10, 11, 97, 13]);
     expect(a.toJSON()).toEqual([10, 11, 97, 13]);
 
-    // TODO
-    // splice with one
-    // splice to remove
-    // splice to insert
+    p.splice(1, 1);
+    await Promise.resolve();
+    expect(p).toEqual([10, 97, 13]);
+    expect(a.toJSON()).toEqual([10, 97, 13]);
+
+    p.splice(1, 0, 95, 96);
+    await Promise.resolve();
+    expect(p).toEqual([10, 95, 96, 97, 13]);
+    expect(a.toJSON()).toEqual([10, 95, 96, 97, 13]);
   });
 });

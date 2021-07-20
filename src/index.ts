@@ -245,19 +245,30 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
           return;
         }
         const i = Number(path[0]);
-        if (Number.isFinite(i)) {
-          if (op[0] === 'delete') {
+        if (!Number.isFinite(i)) {
+          return;
+        }
+        if (op[0] === 'delete') {
+          if (y.length > i) {
             y.delete(i, 1);
-          } else if (op[0] === 'set') {
-            if (y.length > i) {
-              y.delete(i, 1);
-            }
-            const pv = p[i];
-            insertPValueToY(pv, i);
-          } else if (op[0] === 'insert') {
-            const pv = p[i];
-            insertPValueToY(pv, i);
           }
+          return;
+        }
+        const pv = p[i];
+        if (pv === undefined) {
+          return;
+        }
+        if (op[0] === 'set') {
+          if (y.length > i) {
+            y.delete(i, 1);
+          }
+          while (y.length < i) {
+            // HACK it should be replaced in the same transact
+            insertPValueToY(false as unknown as T, y.length);
+          }
+          insertPValueToY(pv, i);
+        } else if (op[0] === 'insert') {
+          insertPValueToY(pv, i);
         }
       });
     });
