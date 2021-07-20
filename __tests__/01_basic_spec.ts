@@ -127,10 +127,40 @@ describe('bindProxyAndYArray', () => {
     expect(p).toEqual([10, 11, 12, 13]);
     expect(a.toJSON()).toEqual([10, 11, 12, 13]);
 
+    a.unshift([9]);
+    await Promise.resolve();
+    expect(a.toJSON()).toEqual([9, 10, 11, 12, 13]);
+    expect(p).toEqual([9, 10, 11, 12, 13]);
+
+    p.unshift(8);
+    await Promise.resolve();
+    expect(p).toEqual([8, 9, 10, 11, 12, 13]);
+    expect(a.toJSON()).toEqual([8, 9, 10, 11, 12, 13]);
+
+    a.delete(0, 1);
+    await Promise.resolve();
+    expect(a.toJSON()).toEqual([9, 10, 11, 12, 13]);
+    expect(p).toEqual([9, 10, 11, 12, 13]);
+
+    p.shift();
+    await Promise.resolve();
+    expect(p).toEqual([10, 11, 12, 13]);
+    expect(a.toJSON()).toEqual([10, 11, 12, 13]);
+
+    doc.transact(() => {
+      a.delete(2, 1);
+      a.insert(2, [99]);
+    });
+    await Promise.resolve();
+    expect(p).toEqual([10, 11, 99, 13]);
+    expect(a.toJSON()).toEqual([10, 11, 99, 13]);
+
+    p[2] = 98;
+    await Promise.resolve();
+    expect(p).toEqual([10, 11, 98, 13]);
+    expect(a.toJSON()).toEqual([10, 11, 98, 13]);
+
     // TODO
-    // unshift
-    // shift
-    // [index]
     // splice with one
     // splice to remove
     // splice to insert

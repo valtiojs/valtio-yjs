@@ -220,7 +220,14 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
 
   // subscribe p
   subscribe(p, (ops) => {
-    if (p.length === y.length) {
+    if (
+      p.length === y.length &&
+      !ops.every(
+        (op) =>
+          op[1].length !== 1 ||
+          (op[0] === 'set' && op[2] !== undefined && op[3] !== undefined),
+      )
+    ) {
       return;
     }
     // console.log(ops);
@@ -258,26 +265,31 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
 
   // subscribe y
   y.observe((event) => {
-    if (y.length === p.length) {
+    if (
+      y.length === p.length &&
+      event.changes.delta.reduce((a, c) => a + (c.insert?.length || 0), 0) !==
+        event.changes.delta.reduce((a, c) => a + (c.delete || 0), 0)
+    ) {
       return;
     }
     // console.log(JSON.stringify(event.changes));
-    let retain: number | undefined;
+    let retain = 0;
     event.changes.delta.forEach((item) => {
-      if ('retain' in item) {
+      if (item.retain) {
         retain = item.retain;
       }
       if (item.delete) {
-        p.splice(retain || 0, item.delete);
+        p.splice(retain, item.delete);
       }
       if (item.insert) {
         if (Array.isArray(item.insert)) {
           item.insert.forEach((yv, i) => {
-            insertYValueToP(yv, (retain || 0) + i);
+            insertYValueToP(yv, retain + i);
           });
         } else {
-          insertYValueToP(item.insert as unknown as T, retain || 0);
+          insertYValueToP(item.insert as unknown as T, retain);
         }
+        retain += item.insert.length;
       }
     });
   });
