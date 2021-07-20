@@ -224,26 +224,35 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
       return;
     }
     // console.log(ops);
-    guessInsertOps(ops as Op[]).forEach((op) => {
-      const path = op[1];
-      if (path.length !== 1) {
-        return;
+    const transact = (fn: () => void) => {
+      if (y.doc) {
+        y.doc.transact(fn);
+      } else {
+        fn();
       }
-      const i = Number(path[0]);
-      if (Number.isFinite(i)) {
-        if (op[0] === 'delete') {
-          y.delete(i, 1);
-        } else if (op[0] === 'set') {
-          if (op[3] !== undefined) {
-            y.delete(i, 1);
-          }
-          const pv = p[i];
-          insertPValueToY(pv, i);
-        } else if (op[0] === 'insert') {
-          const pv = p[i];
-          insertPValueToY(pv, i);
+    };
+    transact(() => {
+      guessInsertOps(ops as Op[]).forEach((op) => {
+        const path = op[1];
+        if (path.length !== 1) {
+          return;
         }
-      }
+        const i = Number(path[0]);
+        if (Number.isFinite(i)) {
+          if (op[0] === 'delete') {
+            y.delete(i, 1);
+          } else if (op[0] === 'set') {
+            if (y.length > i) {
+              y.delete(i, 1);
+            }
+            const pv = p[i];
+            insertPValueToY(pv, i);
+          } else if (op[0] === 'insert') {
+            const pv = p[i];
+            insertPValueToY(pv, i);
+          }
+        }
+      });
     });
   });
 

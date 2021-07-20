@@ -90,13 +90,14 @@ describe('bindProxyAndYArray', () => {
     expect(a.toJSON()).toEqual([]);
 
     a.push(['a']);
-    expect(p).toEqual(['a']);
+    await Promise.resolve();
     expect(a.toJSON()).toEqual(['a']);
+    expect(p).toEqual(['a']);
 
     p.push('b');
     await Promise.resolve();
-    expect(a.toJSON()).toEqual(['a', 'b']);
     expect(p).toEqual(['a', 'b']);
+    expect(a.toJSON()).toEqual(['a', 'b']);
   });
 
   it('simple array with various operations', async () => {
@@ -107,6 +108,7 @@ describe('bindProxyAndYArray', () => {
     bindProxyAndYArray(p, a);
 
     a.push([20]);
+    await Promise.resolve();
     expect(a.toJSON()).toEqual([10, 11, 12, 13, 20]);
     expect(p).toEqual([10, 11, 12, 13, 20]);
 
@@ -116,6 +118,7 @@ describe('bindProxyAndYArray', () => {
     expect(a.toJSON()).toEqual([10, 11, 12, 13, 20, 21]);
 
     a.delete(5, 1);
+    await Promise.resolve();
     expect(a.toJSON()).toEqual([10, 11, 12, 13, 20]);
     expect(p).toEqual([10, 11, 12, 13, 20]);
 
