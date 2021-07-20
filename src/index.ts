@@ -97,6 +97,211 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
   });
 };
 
+type Op = [op: string, path: string[], value1: unknown, value2: unknown];
+const guessInsertOps = (ops: Op[]): Op[] => {
+  const newOps = [...ops];
+  let i = 0;
+  let startPos = -1;
+  let startIdx = -1;
+  const replaceWithInsert = () => {
+    if (i - 1 > startPos) {
+      newOps.splice(startPos, i - startPos, [
+        'insert',
+        [String(startIdx - (i - 1 - startPos))],
+        newOps[i - 1][2],
+        undefined,
+      ]);
+    }
+  };
+  while (i < newOps.length) {
+    if (startPos >= 0) {
+      if (
+        newOps[i][0] === 'set' &&
+        newOps[i][1].length === 1 &&
+        newOps[i][1][0] === String(startIdx - (i - startPos)) &&
+        newOps[i][3] === newOps[i - 1][2]
+      ) {
+        // continue
+      } else {
+        replaceWithInsert();
+        startPos = -1;
+        startIdx = -1;
+      }
+    } else if (
+      newOps[i][0] === 'set' &&
+      newOps[i][1].length === 1 &&
+      newOps[i][3] === undefined
+    ) {
+      const idx = Number(newOps[i][1][0]);
+      if (Number.isFinite(idx)) {
+        startPos = i;
+        startIdx = idx;
+      }
+    }
+    i += 1;
+  }
+  if (startPos >= 0) {
+    replaceWithInsert();
+  }
+  return newOps;
+};
+
+/*
+console.log(
+  guessInsertOps([
+    ['set', ['3'], 'c', undefined],
+    ['set', ['2'], 'b', 'c'],
+    ['set', ['1'], 'a', 'b'],
+    ['set', ['0'], 'd', 'a'],
+  ]),
+);
+*/
+
 export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
-  throw new Error(`TODO ${p} ${y}`);
+  const insertPValueToY = (pv: T, i: number) => {
+    if (Array.isArray(pv)) {
+      const yv = new Y.Array();
+      bindProxyAndYArray(pv, yv);
+      y.insert(i, [yv as unknown as T]);
+    } else if (isObject(pv)) {
+      const yv = new Y.Map();
+      bindProxyAndYMap(pv, yv);
+      y.insert(i, [yv as unknown as T]);
+    } else if (
+      typeof pv === 'string' ||
+      typeof pv === 'number' ||
+      typeof pv === 'boolean'
+    ) {
+      y.insert(i, [pv]);
+    } else {
+      throw new Error('unsupported p type');
+    }
+  };
+
+  const insertYValueToP = (yv: T, i: number) => {
+    if (yv instanceof Y.Array) {
+      const pv = proxy(yv.toJSON());
+      bindProxyAndYArray(pv, yv);
+      p.splice(i, 0, pv as unknown as T);
+    } else if (yv instanceof Y.Map) {
+      const pv = proxy(yv.toJSON());
+      bindProxyAndYMap(pv, yv);
+      p.splice(i, 0, pv as unknown as T);
+    } else if (
+      typeof yv === 'string' ||
+      typeof yv === 'number' ||
+      typeof yv === 'boolean'
+    ) {
+      p.splice(i, 0, yv);
+    } else {
+      throw new Error('unsupported y type');
+    }
+  };
+
+  // initialize from p
+  p.forEach((pv, i) => {
+    const yv = y.get(i);
+    const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
+    if (!deepEqual(json, pv)) {
+      insertPValueToY(pv, i);
+    }
+  });
+
+  // initialize from y
+  y.forEach((yv, i) => {
+    const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
+    if (!deepEqual(p[i], json)) {
+      insertYValueToP(yv, i);
+    }
+  });
+
+  // strip p
+  p.splice(y.length);
+
+  // subscribe p
+  subscribe(p, (ops) => {
+    if (
+      p.length === y.length &&
+      p.every((pv, i) => {
+        const yv = y.get(i);
+        const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
+        return deepEqual(pv, json);
+      })
+    ) {
+      return;
+    }
+    // console.log(ops);
+    const transact = (fn: () => void) => {
+      if (y.doc) {
+        y.doc.transact(fn);
+      } else {
+        fn();
+      }
+    };
+    transact(() => {
+      guessInsertOps(ops as Op[]).forEach((op) => {
+        const path = op[1];
+        if (path.length !== 1) {
+          return;
+        }
+        const i = Number(path[0]);
+        if (!Number.isFinite(i)) {
+          return;
+        }
+        if (op[0] === 'delete') {
+          if (y.length > i) {
+            y.delete(i, 1);
+          }
+          return;
+        }
+        const pv = p[i];
+        if (pv === undefined) {
+          return;
+        }
+        if (op[0] === 'set') {
+          if (y.length > i) {
+            y.delete(i, 1);
+          }
+          while (y.length < i) {
+            // HACK it should be replaced in the same transact
+            insertPValueToY(false as unknown as T, y.length);
+          }
+          insertPValueToY(pv, i);
+        } else if (op[0] === 'insert') {
+          insertPValueToY(pv, i);
+        }
+      });
+    });
+  });
+
+  // subscribe y
+  y.observe((event) => {
+    if (
+      y.length === p.length &&
+      event.changes.delta.reduce((a, c) => a + (c.insert?.length || 0), 0) !==
+        event.changes.delta.reduce((a, c) => a + (c.delete || 0), 0)
+    ) {
+      return;
+    }
+    // console.log(JSON.stringify(event.changes));
+    let retain = 0;
+    event.changes.delta.forEach((item) => {
+      if (item.retain) {
+        retain = item.retain;
+      }
+      if (item.delete) {
+        p.splice(retain, item.delete);
+      }
+      if (item.insert) {
+        if (Array.isArray(item.insert)) {
+          item.insert.forEach((yv, i) => {
+            insertYValueToP(yv, retain + i);
+          });
+        } else {
+          insertYValueToP(item.insert as unknown as T, retain);
+        }
+        retain += item.insert.length;
+      }
+    });
+  });
 };
