@@ -61,19 +61,12 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
 
   // initialize from p
   Object.entries(p).forEach(([k, pv]) => {
-    const yv = y.get(k);
-    const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
-    if (!deepEqual(json, pv)) {
-      setPValueToY(pv, k);
-    }
+    setPValueToY(pv, k);
   });
 
   // initialize from y
   y.forEach((yv, k) => {
-    const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
-    if (!deepEqual(p[k], json)) {
-      setYValueToP(yv, k);
-    }
+    setYValueToP(yv, k);
   });
 
   // subscribe p
