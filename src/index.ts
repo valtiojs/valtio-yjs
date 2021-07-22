@@ -263,14 +263,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
     };
     transact(() => {
       arrayOps.forEach((op) => {
-        const path = op[1];
-        if (path.length !== 1) {
-          return;
-        }
-        const i = Number(path[0]);
-        if (!Number.isFinite(i)) {
-          return;
-        }
+        const i = op[1];
         if (op[0] === 'delete') {
           if (y.length > i) {
             y.delete(i, 1);

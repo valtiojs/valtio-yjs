@@ -12,7 +12,7 @@ describe('single operation', () => {
     p.push('d');
     await Promise.resolve();
     expect(lastOps).toEqual([['set', ['3'], 'd', undefined]]);
-    expect(parseProxyOps(lastOps)).toEqual([['set', ['3'], 'd', undefined]]);
+    expect(parseProxyOps(lastOps)).toEqual([['set', 3, 'd', undefined]]);
   });
 
   it('unshift', async () => {
@@ -30,6 +30,6 @@ describe('single operation', () => {
       ['set', ['1'], 'a', 'b'],
       ['set', ['0'], 'd', 'a'],
     ]);
-    expect(parseProxyOps(lastOps)).toEqual([['insert', ['0'], 'd', undefined]]);
+    expect(parseProxyOps(lastOps)).toEqual([['insert', 0, 'd', undefined]]);
   });
 });
