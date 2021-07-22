@@ -239,16 +239,41 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
   // initialize from p
   p.forEach((pv, i) => {
     const yv = y.get(i);
-    const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
-    if (!deepEqual(json, pv)) {
+    if (
+      Array.isArray(pv) &&
+      yv instanceof Y.Array &&
+      deepEqual(pv, yv.toJSON())
+    ) {
+      bindProxyAndYArray(pv, yv);
+    } else if (
+      !Array.isArray(pv) &&
+      isObject(pv) &&
+      yv instanceof Y.Map &&
+      deepEqual(pv, yv.toJSON())
+    ) {
+      bindProxyAndYMap(pv, yv);
+    } else {
       insertPValueToY(pv, i);
     }
   });
 
   // initialize from y
   y.forEach((yv, i) => {
-    const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
-    if (!deepEqual(p[i], json)) {
+    const pv = p[i];
+    if (
+      Array.isArray(pv) &&
+      yv instanceof Y.Array &&
+      deepEqual(pv, yv.toJSON())
+    ) {
+      bindProxyAndYArray(pv, yv);
+    } else if (
+      !Array.isArray(pv) &&
+      isObject(pv) &&
+      yv instanceof Y.Map &&
+      deepEqual(pv, yv.toJSON())
+    ) {
+      bindProxyAndYMap(pv, yv);
+    } else {
       insertYValueToP(yv, i);
     }
   });
