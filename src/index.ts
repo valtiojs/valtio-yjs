@@ -196,13 +196,17 @@ console.log(
 */
 
 export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
+  const pv2yvCache = new WeakMap<object, unknown>();
+
   const insertPValueToY = (pv: T, i: number) => {
     if (Array.isArray(pv)) {
       const yv = new Y.Array();
+      pv2yvCache.set(pv, yv);
       bindProxyAndYArray(pv, yv);
       y.insert(i, [yv as unknown as T]);
     } else if (isObject(pv)) {
       const yv = new Y.Map();
+      pv2yvCache.set(pv, yv);
       bindProxyAndYMap(pv, yv);
       y.insert(i, [yv as unknown as T]);
     } else if (
@@ -219,10 +223,12 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
   const insertYValueToP = (yv: T, i: number) => {
     if (yv instanceof Y.Array) {
       const pv = proxy(yv.toJSON());
+      pv2yvCache.set(pv, yv);
       bindProxyAndYArray(pv, yv);
       p.splice(i, 0, pv as unknown as T);
     } else if (yv instanceof Y.Map) {
       const pv = proxy(yv.toJSON());
+      pv2yvCache.set(pv, yv);
       bindProxyAndYMap(pv, yv);
       p.splice(i, 0, pv as unknown as T);
     } else if (
@@ -244,14 +250,20 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
       yv instanceof Y.Array &&
       deepEqual(pv, yv.toJSON())
     ) {
-      bindProxyAndYArray(pv, yv);
+      if (pv2yvCache.get(pv) !== yv) {
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYArray(pv, yv);
+      }
     } else if (
       !Array.isArray(pv) &&
       isObject(pv) &&
       yv instanceof Y.Map &&
       deepEqual(pv, yv.toJSON())
     ) {
-      bindProxyAndYMap(pv, yv);
+      if (pv2yvCache.get(pv) !== yv) {
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYMap(pv, yv);
+      }
     } else {
       insertPValueToY(pv, i);
     }
@@ -265,14 +277,20 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
       yv instanceof Y.Array &&
       deepEqual(pv, yv.toJSON())
     ) {
-      bindProxyAndYArray(pv, yv);
+      if (pv2yvCache.get(pv) !== yv) {
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYArray(pv, yv);
+      }
     } else if (
       !Array.isArray(pv) &&
       isObject(pv) &&
       yv instanceof Y.Map &&
       deepEqual(pv, yv.toJSON())
     ) {
-      bindProxyAndYMap(pv, yv);
+      if (pv2yvCache.get(pv) !== yv) {
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYMap(pv, yv);
+      }
     } else {
       insertYValueToP(yv, i);
     }
