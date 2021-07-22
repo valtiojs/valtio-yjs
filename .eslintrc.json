@@ -26,7 +26,8 @@
     "@typescript-eslint/ban-types": "off",
     "import/extensions": ["error", "never"],
     "no-use-before-define": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "import/prefer-default-export": "off"
   },
   "overrides": [{
     "files": ["__tests__/**/*"],

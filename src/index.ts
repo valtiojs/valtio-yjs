@@ -1,6 +1,7 @@
 import { proxy, subscribe } from 'valtio/vanilla';
 import * as Y from 'yjs';
 import deepEqual from 'fast-deep-equal';
+import { parseProxyOps } from './parseProxyOps';
 
 const isObject = (x: unknown): x is Record<string, unknown> =>
   typeof x === 'object' && x !== null;
@@ -135,66 +136,6 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
   });
 };
 
-type Op = [op: string, path: string[], value1: unknown, value2: unknown];
-const guessInsertOps = (ops: Op[]): Op[] => {
-  const newOps = [...ops];
-  let i = 0;
-  let startPos = -1;
-  let startIdx = -1;
-  const replaceWithInsert = () => {
-    if (i - 1 > startPos) {
-      newOps.splice(startPos, i - startPos, [
-        'insert',
-        [String(startIdx - (i - 1 - startPos))],
-        newOps[i - 1][2],
-        undefined,
-      ]);
-    }
-  };
-  while (i < newOps.length) {
-    if (startPos >= 0) {
-      if (
-        newOps[i][0] === 'set' &&
-        newOps[i][1].length === 1 &&
-        newOps[i][1][0] === String(startIdx - (i - startPos)) &&
-        newOps[i][3] === newOps[i - 1][2]
-      ) {
-        // continue
-      } else {
-        replaceWithInsert();
-        startPos = -1;
-        startIdx = -1;
-      }
-    } else if (
-      newOps[i][0] === 'set' &&
-      newOps[i][1].length === 1 &&
-      newOps[i][3] === undefined
-    ) {
-      const idx = Number(newOps[i][1][0]);
-      if (Number.isFinite(idx)) {
-        startPos = i;
-        startIdx = idx;
-      }
-    }
-    i += 1;
-  }
-  if (startPos >= 0) {
-    replaceWithInsert();
-  }
-  return newOps;
-};
-
-/*
-console.log(
-  guessInsertOps([
-    ['set', ['3'], 'c', undefined],
-    ['set', ['2'], 'b', 'c'],
-    ['set', ['1'], 'a', 'b'],
-    ['set', ['0'], 'd', 'a'],
-  ]),
-);
-*/
-
 export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
   const pv2yvCache = new WeakMap<object, unknown>();
 
@@ -301,6 +242,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
 
   // subscribe p
   subscribe(p, (ops) => {
+    const arrayOps = parseProxyOps(ops);
     if (
       p.length === y.length &&
       p.every((pv, i) => {
@@ -311,7 +253,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
     ) {
       return;
     }
-    // console.log(ops);
+    // console.log(arrayOps);
     const transact = (fn: () => void) => {
       if (y.doc) {
         y.doc.transact(fn);
@@ -320,7 +262,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
       }
     };
     transact(() => {
-      guessInsertOps(ops as Op[]).forEach((op) => {
+      arrayOps.forEach((op) => {
         const path = op[1];
         if (path.length !== 1) {
           return;
