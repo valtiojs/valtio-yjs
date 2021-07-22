@@ -61,12 +61,48 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
 
   // initialize from p
   Object.entries(p).forEach(([k, pv]) => {
-    setPValueToY(pv, k);
+    const yv = y.get(k);
+    if (
+      Array.isArray(pv) &&
+      yv instanceof Y.Array &&
+      deepEqual(pv, yv.toJSON())
+    ) {
+      pv2yvCache.set(pv, yv);
+      bindProxyAndYArray(pv, yv);
+    } else if (
+      !Array.isArray(pv) &&
+      isObject(pv) &&
+      yv instanceof Y.Map &&
+      deepEqual(pv, yv.toJSON())
+    ) {
+      pv2yvCache.set(pv, yv);
+      bindProxyAndYMap(pv, yv);
+    } else {
+      setPValueToY(pv, k);
+    }
   });
 
   // initialize from y
   y.forEach((yv, k) => {
-    setYValueToP(yv, k);
+    const pv = p[k];
+    if (
+      Array.isArray(pv) &&
+      yv instanceof Y.Array &&
+      deepEqual(pv, yv.toJSON())
+    ) {
+      pv2yvCache.set(pv, yv);
+      bindProxyAndYArray(pv, yv);
+    } else if (
+      !Array.isArray(pv) &&
+      isObject(pv) &&
+      yv instanceof Y.Map &&
+      deepEqual(pv, yv.toJSON())
+    ) {
+      pv2yvCache.set(pv, yv);
+      bindProxyAndYMap(pv, yv);
+    } else {
+      setYValueToP(yv, k);
+    }
   });
 
   // subscribe p
