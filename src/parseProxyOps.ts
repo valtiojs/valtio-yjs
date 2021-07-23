@@ -17,39 +17,24 @@ export const parseProxyOps = (ops: Op[]): ArrayOp[] => {
     return [[op[0], index, op[2], op[3]]];
   });
   let i = 0;
-  let startPos = -1;
-  let startIdx = -1;
-  const replaceWithInsert = () => {
-    if (i - 1 > startPos) {
-      arrayOps.splice(startPos, i - startPos, [
+  while (i < arrayOps.length) {
+    if (
+      i + 1 < arrayOps.length &&
+      (arrayOps[i][0] === 'set' || arrayOps[i][0] === 'insert') &&
+      arrayOps[i + 1][0] === 'set' &&
+      arrayOps[i][1] === arrayOps[i + 1][1] + 1 &&
+      arrayOps[i][3] === undefined &&
+      arrayOps[i][2] === arrayOps[i + 1][3]
+    ) {
+      arrayOps.splice(i, 2, [
         'insert',
-        startIdx - (i - 1 - startPos),
-        arrayOps[i - 1][2],
+        arrayOps[i + 1][1],
+        arrayOps[i + 1][2],
         undefined,
       ]);
+    } else {
+      i += 1;
     }
-  };
-  while (i < arrayOps.length) {
-    if (startPos >= 0) {
-      if (
-        arrayOps[i][0] === 'set' &&
-        arrayOps[i][1] === startIdx - (i - startPos) &&
-        arrayOps[i][3] === arrayOps[i - 1][2]
-      ) {
-        // continue
-      } else {
-        replaceWithInsert();
-        startPos = -1;
-        startIdx = -1;
-      }
-    } else if (arrayOps[i][0] === 'set' && arrayOps[i][3] === undefined) {
-      startPos = i;
-      startIdx = arrayOps[i][1];
-    }
-    i += 1;
-  }
-  if (startPos >= 0) {
-    replaceWithInsert();
   }
   return arrayOps;
 };

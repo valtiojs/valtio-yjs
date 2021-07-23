@@ -248,6 +248,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
       p.every((pv, i) => {
         const yv = y.get(i);
         const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
+        // FIXME
         return deepEqual(pv, json);
       })
     ) {
@@ -278,6 +279,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
           if (y.length > i) {
             y.delete(i, 1);
           }
+          // FIXME
           while (y.length < i) {
             // HACK it should be replaced in the same transact
             insertPValueToY(false as unknown as T, y.length);

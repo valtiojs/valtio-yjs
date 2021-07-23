@@ -32,4 +32,38 @@ describe('single operation', () => {
     ]);
     expect(parseProxyOps(lastOps)).toEqual([['insert', 0, 'd', undefined]]);
   });
+
+  it('pop', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.pop();
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['delete', ['2'], 'c'],
+      ['set', ['length'], 2, 3],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([['delete', 2, 'c', undefined]]);
+  });
+
+  it.skip('shift', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.shift();
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['0'], 'b', 'a'],
+      ['set', ['1'], 'c', 'b'],
+      ['delete', ['2'], 'c'],
+      ['set', ['length'], 2, 3],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([['delete', 0, 'a', undefined]]);
+  });
 });
