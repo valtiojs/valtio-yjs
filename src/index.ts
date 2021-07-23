@@ -279,11 +279,6 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
           if (y.length > i) {
             y.delete(i, 1);
           }
-          // FIXME
-          while (y.length < i) {
-            // HACK it should be replaced in the same transact
-            insertPValueToY(false as unknown as T, y.length);
-          }
           insertPValueToY(pv, i);
         } else if (op[0] === 'insert') {
           insertPValueToY(pv, i);

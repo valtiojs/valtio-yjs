@@ -100,79 +100,105 @@ describe('bindProxyAndYArray', () => {
     expect(a.toJSON()).toEqual(['a', 'b']);
   });
 
-  it('simple array with various operations', async () => {
+  describe('simple array with various operations', async () => {
     const doc = new Y.Doc();
     const p = proxy([10, 11, 12, 13]);
     const a = doc.getArray<number>('arr');
 
     bindProxyAndYArray(p, a);
 
-    a.push([20]);
-    await Promise.resolve();
-    expect(a.toJSON()).toEqual([10, 11, 12, 13, 20]);
-    expect(p).toEqual([10, 11, 12, 13, 20]);
-
-    p.push(21);
-    await Promise.resolve();
-    expect(p).toEqual([10, 11, 12, 13, 20, 21]);
-    expect(a.toJSON()).toEqual([10, 11, 12, 13, 20, 21]);
-
-    a.delete(5, 1);
-    await Promise.resolve();
-    expect(a.toJSON()).toEqual([10, 11, 12, 13, 20]);
-    expect(p).toEqual([10, 11, 12, 13, 20]);
-
-    p.pop();
-    await Promise.resolve();
-    expect(p).toEqual([10, 11, 12, 13]);
-    expect(a.toJSON()).toEqual([10, 11, 12, 13]);
-
-    a.unshift([9]);
-    await Promise.resolve();
-    expect(a.toJSON()).toEqual([9, 10, 11, 12, 13]);
-    expect(p).toEqual([9, 10, 11, 12, 13]);
-
-    p.unshift(8);
-    await Promise.resolve();
-    expect(p).toEqual([8, 9, 10, 11, 12, 13]);
-    expect(a.toJSON()).toEqual([8, 9, 10, 11, 12, 13]);
-
-    a.delete(0, 1);
-    await Promise.resolve();
-    expect(a.toJSON()).toEqual([9, 10, 11, 12, 13]);
-    expect(p).toEqual([9, 10, 11, 12, 13]);
-
-    p.shift();
-    await Promise.resolve();
-    expect(p).toEqual([10, 11, 12, 13]);
-    expect(a.toJSON()).toEqual([10, 11, 12, 13]);
-
-    doc.transact(() => {
-      a.delete(2, 1);
-      a.insert(2, [99]);
+    it('a push', async () => {
+      a.push([20]);
+      await Promise.resolve();
+      expect(a.toJSON()).toEqual([10, 11, 12, 13, 20]);
+      expect(p).toEqual([10, 11, 12, 13, 20]);
     });
-    await Promise.resolve();
-    expect(p).toEqual([10, 11, 99, 13]);
-    expect(a.toJSON()).toEqual([10, 11, 99, 13]);
 
-    p[2] = 98;
-    await Promise.resolve();
-    expect(p).toEqual([10, 11, 98, 13]);
-    expect(a.toJSON()).toEqual([10, 11, 98, 13]);
+    it('p push', async () => {
+      p.push(21);
+      await Promise.resolve();
+      expect(p).toEqual([10, 11, 12, 13, 20, 21]);
+      expect(a.toJSON()).toEqual([10, 11, 12, 13, 20, 21]);
+    });
 
-    p.splice(2, 1, 97);
-    await Promise.resolve();
-    expect(p).toEqual([10, 11, 97, 13]);
-    expect(a.toJSON()).toEqual([10, 11, 97, 13]);
+    it('a pop', async () => {
+      a.delete(5, 1);
+      await Promise.resolve();
+      expect(a.toJSON()).toEqual([10, 11, 12, 13, 20]);
+      expect(p).toEqual([10, 11, 12, 13, 20]);
+    });
 
-    p.splice(1, 1);
-    await Promise.resolve();
-    expect(p).toEqual([10, 97, 13]);
-    expect(a.toJSON()).toEqual([10, 97, 13]);
+    it('p pop', async () => {
+      p.pop();
+      await Promise.resolve();
+      expect(p).toEqual([10, 11, 12, 13]);
+      expect(a.toJSON()).toEqual([10, 11, 12, 13]);
+    });
 
-    p.splice(1, 0, 95, 96);
-    await Promise.resolve();
-    expect(p).toEqual([10, 95, 96, 97, 13]);
-    expect(a.toJSON()).toEqual([10, 95, 96, 97, 13]);
+    it('a unshift', async () => {
+      a.unshift([9]);
+      await Promise.resolve();
+      expect(a.toJSON()).toEqual([9, 10, 11, 12, 13]);
+      expect(p).toEqual([9, 10, 11, 12, 13]);
+    });
+
+    it('p unshift', async () => {
+      p.unshift(8);
+      await Promise.resolve();
+      expect(p).toEqual([8, 9, 10, 11, 12, 13]);
+      expect(a.toJSON()).toEqual([8, 9, 10, 11, 12, 13]);
+    });
+
+    it('a shift', async () => {
+      a.delete(0, 1);
+      await Promise.resolve();
+      expect(a.toJSON()).toEqual([9, 10, 11, 12, 13]);
+      expect(p).toEqual([9, 10, 11, 12, 13]);
+    });
+
+    it('a shift', async () => {
+      p.shift();
+      await Promise.resolve();
+      expect(p).toEqual([10, 11, 12, 13]);
+      expect(a.toJSON()).toEqual([10, 11, 12, 13]);
+    });
+
+    it('a replace', async () => {
+      doc.transact(() => {
+        a.delete(2, 1);
+        a.insert(2, [99]);
+      });
+      await Promise.resolve();
+      expect(p).toEqual([10, 11, 99, 13]);
+      expect(a.toJSON()).toEqual([10, 11, 99, 13]);
+    });
+
+    it('p replace', async () => {
+      p[2] = 98;
+      await Promise.resolve();
+      expect(p).toEqual([10, 11, 98, 13]);
+      expect(a.toJSON()).toEqual([10, 11, 98, 13]);
+    });
+
+    it('p splice (delete+insert)', async () => {
+      p.splice(2, 1, 97);
+      await Promise.resolve();
+      expect(p).toEqual([10, 11, 97, 13]);
+      expect(a.toJSON()).toEqual([10, 11, 97, 13]);
+    });
+
+    it('p splice (delete)', async () => {
+      p.splice(1, 1);
+      await Promise.resolve();
+      expect(p).toEqual([10, 97, 13]);
+      expect(a.toJSON()).toEqual([10, 97, 13]);
+    });
+
+    it('p splice (insert)', async () => {
+      p.splice(1, 0, 95, 96);
+      await Promise.resolve();
+      expect(p).toEqual([10, 95, 96, 97, 13]);
+      expect(a.toJSON()).toEqual([10, 95, 96, 97, 13]);
+    });
   });
 });
