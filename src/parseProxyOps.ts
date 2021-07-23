@@ -16,6 +16,20 @@ export const parseProxyOps = (ops: Op[]): ArrayOp[] => {
     if (!Number.isFinite(index)) return [];
     return [[op[0], index, op[2], op[3]]];
   });
+  const findContinuousDelete = (
+    startOpIndex: number,
+    startArrayIndex: number,
+  ) => {
+    let d = 0;
+    while (
+      startOpIndex + d + 1 < arrayOps.length &&
+      arrayOps[startOpIndex + d + 1][0] === 'delete' &&
+      arrayOps[startOpIndex + d + 1][1] === startArrayIndex - (d + 1)
+    ) {
+      d += 1;
+    }
+    return d;
+  };
   let i = 0;
   while (i < arrayOps.length) {
     if (
@@ -32,6 +46,26 @@ export const parseProxyOps = (ops: Op[]): ArrayOp[] => {
         arrayOps[i + 1][2],
         undefined,
       ]);
+    } else if (i > 0 && arrayOps[i][0] === 'delete') {
+      const arrayStartIndex = arrayOps[i][1];
+      const d = findContinuousDelete(i, arrayStartIndex);
+      if (
+        arrayOps[i - 1][0] === 'set' &&
+        arrayOps[i - 1][1] === arrayStartIndex - (d + 1) &&
+        arrayOps[i - 1][2] === arrayOps[i][2]
+      ) {
+        const newArrayOp: ArrayOp = [
+          'delete',
+          arrayStartIndex - (d + 1),
+          arrayOps[i - 1][3],
+          undefined,
+        ];
+        arrayOps.splice(i - 1, 2);
+        arrayOps.splice(i - 1 + d, 0, newArrayOp);
+        i -= 1;
+      } else {
+        i += 1;
+      }
     } else {
       i += 1;
     }
