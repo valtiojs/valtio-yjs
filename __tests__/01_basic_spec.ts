@@ -100,7 +100,7 @@ describe('bindProxyAndYArray', () => {
     expect(a.toJSON()).toEqual(['a', 'b']);
   });
 
-  describe('simple array with various operations', async () => {
+  describe('simple array with various operations', () => {
     const doc = new Y.Doc();
     const p = proxy([10, 11, 12, 13]);
     const a = doc.getArray<number>('arr');

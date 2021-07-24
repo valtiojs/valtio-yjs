@@ -249,7 +249,7 @@ describe('single operation', () => {
     expect(parseProxyOps(lastOps)).toEqual([
       ['insert', 1, 'd', undefined],
       ['insert', 2, 'e', undefined],
-      ['insert', 3, 'f', undefined],
+      ['set', 3, 'f', undefined],
     ]);
   });
 
@@ -265,6 +265,30 @@ describe('single operation', () => {
     expect(lastOps).toEqual([
       ['set', ['5'], 'd', undefined],
       ['set', ['4'], 'c', undefined],
+      ['set', ['1'], 'e', 'b'],
+      ['set', ['2'], 'f', 'c'],
+      ['set', ['3'], 'g', 'd'],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['set', 1, 'e', 'b'],
+      ['insert', 2, 'f', undefined],
+      ['insert', 3, 'g', undefined],
+    ]);
+  });
+
+  it('splice 1 1 e f g with 5 initial items', async () => {
+    const p = proxy(['a', 'b', 'c', 'd', 'x']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.splice(1, 1, 'e', 'f', 'g');
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['6'], 'x', undefined],
+      ['set', ['5'], 'd', undefined],
+      ['set', ['4'], 'c', 'x'],
       ['set', ['1'], 'e', 'b'],
       ['set', ['2'], 'f', 'c'],
       ['set', ['3'], 'g', 'd'],
@@ -375,6 +399,30 @@ describe('double operations', () => {
     expect(parseProxyOps(lastOps)).toEqual([
       ['delete', 0, 'a', undefined],
       ['delete', 0, 'b', undefined],
+    ]);
+  });
+
+  it('splice 1 0 and splice 1 0', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.splice(1, 0, 'd');
+    p.splice(2, 0, 'e');
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['3'], 'c', undefined],
+      ['set', ['2'], 'b', 'c'],
+      ['set', ['1'], 'd', 'b'],
+      ['set', ['4'], 'c', undefined],
+      ['set', ['3'], 'b', 'c'],
+      ['set', ['2'], 'e', 'b'],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['insert', 1, 'd', undefined],
+      ['insert', 2, 'e', undefined],
     ]);
   });
 });
