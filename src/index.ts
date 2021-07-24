@@ -245,12 +245,12 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
     const arrayOps = parseProxyOps(ops);
     if (
       p.length === y.length &&
-      p.every((pv, i) => {
-        const yv = y.get(i);
-        const json = yv instanceof Y.AbstractType ? yv.toJSON() : yv;
-        // FIXME
-        return deepEqual(pv, json);
-      })
+      arrayOps.reduce(
+        (a, c) =>
+          a +
+          (c[0] === 'insert' || (c[0] === 'set' && c[3] === undefined) ? 1 : 0),
+        0,
+      ) !== arrayOps.reduce((a, c) => a + (c[0] === 'delete' ? 1 : 0), 0)
     ) {
       return;
     }
