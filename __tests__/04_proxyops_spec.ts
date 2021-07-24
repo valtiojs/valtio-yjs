@@ -371,11 +371,121 @@ describe('double operations', () => {
     ]);
   });
 
-  // TODO push pop
-  // TODO pop push
-  // TODO unshift shift
-  // TODO shift unshift
-  // TODO pop pop
+  it('push and pop', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.push('d');
+    p.pop();
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['3'], 'd', undefined],
+      ['delete', ['3'], 'd'],
+      ['set', ['length'], 3, 4],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['set', 3, 'd', undefined],
+      ['delete', 3, 'd', undefined],
+    ]);
+  });
+
+  it('pop and push', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.pop();
+    p.push('d');
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['delete', ['2'], 'c'],
+      ['set', ['length'], 2, 3],
+      ['set', ['2'], 'd', undefined],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['delete', 2, 'c', undefined],
+      ['set', 2, 'd', undefined],
+    ]);
+  });
+
+  it('unshift and shift', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.unshift('d');
+    p.shift();
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['3'], 'c', undefined],
+      ['set', ['2'], 'b', 'c'],
+      ['set', ['1'], 'a', 'b'],
+      ['set', ['0'], 'd', 'a'],
+      ['set', ['0'], 'a', 'd'],
+      ['set', ['1'], 'b', 'a'],
+      ['set', ['2'], 'c', 'b'],
+      ['delete', ['3'], 'c'],
+      ['set', ['length'], 3, 4],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['insert', 0, 'd', undefined],
+      ['delete', 0, 'd', undefined],
+    ]);
+  });
+
+  it('shift and unshift', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.shift();
+    p.unshift('d');
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['0'], 'b', 'a'],
+      ['set', ['1'], 'c', 'b'],
+      ['delete', ['2'], 'c'],
+      ['set', ['length'], 2, 3],
+      ['set', ['2'], 'c', undefined],
+      ['set', ['1'], 'b', 'c'],
+      ['set', ['0'], 'd', 'b'],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['delete', 0, 'a', undefined],
+      ['insert', 0, 'd', undefined],
+    ]);
+  });
+
+  it('pop and pop', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.pop();
+    p.pop();
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['delete', ['2'], 'c'],
+      ['set', ['length'], 2, 3],
+      ['delete', ['1'], 'b'],
+      ['set', ['length'], 1, 2],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['delete', 2, 'c', undefined],
+      ['delete', 1, 'b', undefined],
+    ]);
+  });
 
   it('shift and shift', async () => {
     const p = proxy(['a', 'b', 'c']);

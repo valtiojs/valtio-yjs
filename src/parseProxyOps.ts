@@ -27,6 +27,7 @@ export const parseProxyOps = (ops: Op[]): ArrayOp[] => {
       if (
         (arrayOps[startOpIndex + s + 1][0] === 'set' ||
           arrayOps[startOpIndex + s + 1][0] === 'insert') &&
+        arrayOps[startOpIndex + s + 1][1] < startArrayIndex &&
         arrayOps[startOpIndex + s + 1][3] === arrayOps[startOpIndex][2]
       ) {
         return s + 1;
