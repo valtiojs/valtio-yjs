@@ -15,7 +15,7 @@ valtio-yjs is a two-way binding to bridge them.
 
 It started as an experiment, and the experiment is finished.
 Now, it's in alpha.
-We encourage users to try it in non-trivial apps, and find bugs.
+We encourage developers to try it in non-trivial apps, and find bugs.
 
 ## Install
 
