@@ -9,7 +9,7 @@ a proxy state library for ReactJS and VanillaJS.
 [yjs](https://github.com/yjs/yjs) is
 an implmentation of CRDT algorithm.
 
-valtio-yjs is to connect the two different worlds.
+valtio-yjs is a two-way binding to bridge them.
 
 ## Project status
 
