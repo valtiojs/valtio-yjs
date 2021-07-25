@@ -55,6 +55,6 @@ Using `useSnapshot` in valtio and
 `WebsocketProvider` in [y-websocket](https://github.com/yjs/y-websocket),
 we can create multi-client React apps pretty easily.
 
-- [https://codesandbox.io/s/valtio-yjs-demo-ox3iy](Messages object)
-- [https://codesandbox.io/s/valtio-yjs-array-demo-j1wkp](Messages array)
+- [Messages object](https://codesandbox.io/s/valtio-yjs-demo-ox3iy)
+- [Messages array](https://codesandbox.io/s/valtio-yjs-array-demo-j1wkp)
 - (...open a PR to add your demos)
