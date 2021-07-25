@@ -17,6 +17,12 @@ It started as an experiment, and the experiment is finished.
 Now, it's in alpha.
 We encourage users to try it in non-trivial apps, and find bugs.
 
+## Install
+
+```bash
+yarn add valtio-yjs valtio yjs
+```
+
 ## How to use it?
 
 ```js
