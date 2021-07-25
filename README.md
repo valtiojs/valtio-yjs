@@ -2,7 +2,7 @@
 
 valtio-yjs makes yjs state easy
 
-## What is this?
+## What is this
 
 [valtio](https://github.com/pmndrs/valtio) is
 a proxy state library for ReactJS and VanillaJS.
@@ -23,7 +23,7 @@ We encourage users to try it in non-trivial apps, and find bugs.
 yarn add valtio-yjs valtio yjs
 ```
 
-## How to use it?
+## How to use it
 
 ```js
 import * as Y from "yjs";
@@ -57,4 +57,4 @@ we can create multi-client React apps pretty easily.
 
 - [https://codesandbox.io/s/valtio-yjs-demo-ox3iy](Messages object)
 - [https://codesandbox.io/s/valtio-yjs-array-demo-j1wkp](Messages array)
-- (Open a PR to add your demos)
+- (...open a PR to add your demos)
