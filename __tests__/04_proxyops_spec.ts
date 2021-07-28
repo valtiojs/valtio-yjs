@@ -321,6 +321,59 @@ describe('single operation', () => {
       ['insert', 3, 'g', undefined],
     ]);
   });
+
+  it('splice -1 1', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.splice(-1, 1);
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['delete', ['2'], 'c'],
+      ['set', ['length'], 2, 3],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([['delete', 2, 'c', undefined]]);
+  });
+
+  it('splice -2 1', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.splice(-2, 1);
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['1'], 'c', 'b'],
+      ['delete', ['2'], 'c'],
+      ['set', ['length'], 2, 3],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([['delete', 1, 'b', undefined]]);
+  });
+
+  it('splice -2 1 d e', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.splice(-2, 1, 'd', 'e');
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['3'], 'c', undefined],
+      ['set', ['1'], 'd', 'b'],
+      ['set', ['2'], 'e', 'c'],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['set', 1, 'd', 'b'],
+      ['insert', 2, 'e', undefined],
+    ]);
+  });
 });
 
 describe('double operations', () => {
