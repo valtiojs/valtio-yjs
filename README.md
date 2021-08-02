@@ -7,7 +7,8 @@ valtio-yjs makes yjs state easy
 [valtio](https://github.com/pmndrs/valtio) is
 a proxy state library for ReactJS and VanillaJS.
 [yjs](https://github.com/yjs/yjs) is
-an implmentation of CRDT algorithm.
+an implementation of CRDT algorithm
+(which allows to merge client data without server coordination).
 
 valtio-yjs is a two-way binding to bridge them.
 
