@@ -40,7 +40,7 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       return;
     }
     if (yv instanceof Y.Array) {
-      const pv = proxy(yv.toJSON());
+      const pv = proxy([]);
       pv2yvCache.set(pv, yv);
       bindProxyAndYArray(pv, yv);
       p[k] = pv as unknown as T;
@@ -163,7 +163,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
 
   const insertYValueToP = (yv: T, i: number) => {
     if (yv instanceof Y.Array) {
-      const pv = proxy(yv.toJSON());
+      const pv = proxy([]);
       pv2yvCache.set(pv, yv);
       bindProxyAndYArray(pv, yv);
       p.splice(i, 0, pv as unknown as T);
