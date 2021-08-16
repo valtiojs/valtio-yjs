@@ -43,11 +43,20 @@ const state = proxy({});
 // bind them
 bindProxyAndYMap(state, ymap);
 
+// now you can mutate the state
+state.text = 'hello';
+
 // you can nest objects
 state.obj = { count: 0 };
 
+// and mutate the nested object value
+++state.obj.count;
+
 // you can use arrays too
 state.arr = [1, 2, 3];
+
+// mutating the array is also possible
+state.arr.push(4);
 ```
 
 ## Demos
