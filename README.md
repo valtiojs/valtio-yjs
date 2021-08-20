@@ -67,4 +67,5 @@ we can create multi-client React apps pretty easily.
 
 - [Messages object](https://codesandbox.io/s/valtio-yjs-demo-ox3iy)
 - [Messages array](https://codesandbox.io/s/valtio-yjs-array-demo-j1wkp)
+- [Minecraft + webrtc](https://codesandbox.io/s/minecraft-valtio-yjs-demo-656tq)
 - (...open a PR to add your demos)
