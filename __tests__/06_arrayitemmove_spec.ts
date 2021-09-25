@@ -16,45 +16,13 @@ describe('issue #7', () => {
 
     moveUp(2);
     await Promise.resolve();
-    expect(a.toJSON()).toMatchInlineSnapshot(`
-Array [
-  "a",
-  "c",
-  "b",
-  "d",
-  "e",
-]
-`);
-    expect(p).toMatchInlineSnapshot(`
-Array [
-  "a",
-  "c",
-  "b",
-  "d",
-  "e",
-]
-`);
+    expect(a.toJSON()).toEqual(['a', 'c', 'b', 'd', 'e']);
+    expect(p).toEqual(['a', 'c', 'b', 'd', 'e']);
 
     moveUp(3);
     await Promise.resolve();
-    expect(a.toJSON()).toMatchInlineSnapshot(`
-Array [
-  "a",
-  "c",
-  "d",
-  "b",
-  "e",
-]
-`);
-    expect(p).toMatchInlineSnapshot(`
-Array [
-  "a",
-  "c",
-  "d",
-  "b",
-  "e",
-]
-`);
+    expect(a.toJSON()).toEqual(['a', 'c', 'd', 'b', 'e']);
+    expect(p).toEqual(['a', 'c', 'd', 'b', 'e']);
   });
 
   it('array item move down', async () => {
@@ -70,44 +38,12 @@ Array [
 
     moveDown(2);
     await Promise.resolve();
-    expect(a.toJSON()).toMatchInlineSnapshot(`
-Array [
-  "a",
-  "b",
-  "d",
-  "c",
-  "e",
-]
-`);
-    expect(p).toMatchInlineSnapshot(`
-Array [
-  "a",
-  "b",
-  "d",
-  "c",
-  "e",
-]
-`);
+    expect(a.toJSON()).toEqual(['a', 'b', 'd', 'c', 'e']);
+    expect(p).toEqual(['a', 'b', 'd', 'c', 'e']);
 
     moveDown(1);
     await Promise.resolve();
-    expect(a.toJSON()).toMatchInlineSnapshot(`
-Array [
-  "a",
-  "d",
-  "b",
-  "c",
-  "e",
-]
-`);
-    expect(p).toMatchInlineSnapshot(`
-Array [
-  "a",
-  "d",
-  "b",
-  "c",
-  "e",
-]
-`);
+    expect(a.toJSON()).toEqual(['a', 'd', 'b', 'c', 'e']);
+    expect(p).toEqual(['a', 'd', 'b', 'c', 'e']);
   });
 });
