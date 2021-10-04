@@ -39,6 +39,27 @@ describe('bindProxyAndYMap', () => {
     expect(m.get('bar')).toBe(2);
   });
 
+  it('simple map with null value', async () => {
+    const doc = new Y.Doc();
+    const p = proxy<{ foo: string | null }>({
+      foo: null,
+    });
+    const m = doc.getMap('map');
+    bindProxyAndYMap(p, m);
+
+    expect(p.foo).toBe(null);
+    expect(m.get('foo')).toBe(null);
+
+    m.set('foo', 'bar');
+    expect(p.foo).toBe('bar');
+    expect(m.get('foo')).toBe('bar');
+
+    p.foo = null;
+    await Promise.resolve();
+    expect(p.foo).toBe(null);
+    expect(m.get('foo')).toBe(null);
+  });
+
   it('nested map (from proxy)', async () => {
     const doc = new Y.Doc();
     const p = proxy<{ foo?: { bar?: string } }>({});
