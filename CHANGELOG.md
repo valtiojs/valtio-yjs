@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## [0.1.2] - 2021-10-05
 ### Changed
 - fix: null values in object (#10)
 
