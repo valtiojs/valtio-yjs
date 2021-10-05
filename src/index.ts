@@ -24,6 +24,7 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       bindProxyAndYMap(pv, yv);
       y.set(k, yv as unknown as T);
     } else if (
+      pv === null ||
       typeof pv === 'string' ||
       typeof pv === 'number' ||
       typeof pv === 'boolean'
@@ -50,6 +51,7 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       bindProxyAndYMap(pv, yv);
       p[k] = pv as unknown as T;
     } else if (
+      yv === null ||
       typeof yv === 'string' ||
       typeof yv === 'number' ||
       typeof yv === 'boolean'
