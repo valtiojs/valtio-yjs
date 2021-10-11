@@ -198,6 +198,12 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
         pv2yvCache.set(pv, yv);
         bindProxyAndYMap(pv, yv);
       }
+    } else if (
+      isPrimitiveArrayValue(pv) &&
+      isPrimitiveArrayValue(yv) &&
+      pv === yv
+    ) {
+      // do nothing
     } else {
       insertPValueToY(pv, i);
     }
@@ -225,6 +231,12 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
         pv2yvCache.set(pv, yv);
         bindProxyAndYMap(pv, yv);
       }
+    } else if (
+      isPrimitiveArrayValue(pv) &&
+      isPrimitiveArrayValue(yv) &&
+      pv === yv
+    ) {
+      // do nothing
     } else {
       insertYValueToP(yv, i);
     }
