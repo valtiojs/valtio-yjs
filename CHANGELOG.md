@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.1.3] - 2021-11-02
+### Changed
+- fix: initializing array with primitive values (#12)
+
 ## [0.1.2] - 2021-10-05
 ### Changed
 - fix: null values in object (#10)
