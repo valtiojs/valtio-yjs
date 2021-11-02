@@ -6,6 +6,15 @@ import { parseProxyOps } from './parseProxyOps';
 const isObject = (x: unknown): x is Record<string, unknown> =>
   typeof x === 'object' && x !== null;
 
+const isPrimitiveMapValue = (v: unknown) =>
+  v === null ||
+  typeof v === 'string' ||
+  typeof v === 'number' ||
+  typeof v === 'boolean';
+
+const isPrimitiveArrayValue = (v: unknown) =>
+  typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
+
 export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
   const pv2yvCache = new WeakMap<object, unknown>();
 
@@ -23,12 +32,7 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       pv2yvCache.set(pv, yv);
       bindProxyAndYMap(pv, yv);
       y.set(k, yv as unknown as T);
-    } else if (
-      pv === null ||
-      typeof pv === 'string' ||
-      typeof pv === 'number' ||
-      typeof pv === 'boolean'
-    ) {
+    } else if (isPrimitiveMapValue(pv)) {
       y.set(k, pv);
     } else {
       throw new Error('unsupported p type');
@@ -50,12 +54,7 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       pv2yvCache.set(pv, yv);
       bindProxyAndYMap(pv, yv);
       p[k] = pv as unknown as T;
-    } else if (
-      yv === null ||
-      typeof yv === 'string' ||
-      typeof yv === 'number' ||
-      typeof yv === 'boolean'
-    ) {
+    } else if (isPrimitiveMapValue(yv)) {
       p[k] = yv;
     } else {
       throw new Error('unsupported y type');
@@ -152,11 +151,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
       pv2yvCache.set(pv, yv);
       bindProxyAndYMap(pv, yv);
       y.insert(i, [yv as unknown as T]);
-    } else if (
-      typeof pv === 'string' ||
-      typeof pv === 'number' ||
-      typeof pv === 'boolean'
-    ) {
+    } else if (isPrimitiveArrayValue(pv)) {
       y.insert(i, [pv]);
     } else {
       throw new Error('unsupported p type');
@@ -174,11 +169,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
       pv2yvCache.set(pv, yv);
       bindProxyAndYMap(pv, yv);
       p.splice(i, 0, pv as unknown as T);
-    } else if (
-      typeof yv === 'string' ||
-      typeof yv === 'number' ||
-      typeof yv === 'boolean'
-    ) {
+    } else if (isPrimitiveArrayValue(yv)) {
       p.splice(i, 0, yv);
     } else {
       throw new Error('unsupported y type');
@@ -207,6 +198,12 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
         pv2yvCache.set(pv, yv);
         bindProxyAndYMap(pv, yv);
       }
+    } else if (
+      isPrimitiveArrayValue(pv) &&
+      isPrimitiveArrayValue(yv) &&
+      pv === yv
+    ) {
+      // do nothing
     } else {
       insertPValueToY(pv, i);
     }
@@ -234,6 +231,12 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
         pv2yvCache.set(pv, yv);
         bindProxyAndYMap(pv, yv);
       }
+    } else if (
+      isPrimitiveArrayValue(pv) &&
+      isPrimitiveArrayValue(yv) &&
+      pv === yv
+    ) {
+      // do nothing
     } else {
       insertYValueToP(yv, i);
     }
