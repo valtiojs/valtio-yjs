@@ -15,28 +15,50 @@ const isPrimitiveMapValue = (v: unknown) =>
 const isPrimitiveArrayValue = (v: unknown) =>
   typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
 
-export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
+type Options = {
+  transactionOrigin?: any;
+};
+
+const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
+  if (doc) {
+    doc.transact(fn, opts.transactionOrigin);
+  } else {
+    fn();
+  }
+};
+
+export const bindProxyAndYMap = <T>(
+  p: Record<string, T>,
+  y: Y.Map<T>,
+  opts: Options = { transactionOrigin: null },
+) => {
   const pv2yvCache = new WeakMap<object, unknown>();
 
   const setPValueToY = (pv: T, k: string) => {
-    if (isObject(pv) && pv2yvCache.has(pv) && pv2yvCache.get(pv) === y.get(k)) {
-      return;
-    }
-    if (Array.isArray(pv)) {
-      const yv = new Y.Array();
-      pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv);
-      y.set(k, yv as unknown as T);
-    } else if (isObject(pv)) {
-      const yv = new Y.Map();
-      pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv);
-      y.set(k, yv as unknown as T);
-    } else if (isPrimitiveMapValue(pv)) {
-      y.set(k, pv);
-    } else {
-      throw new Error('unsupported p type');
-    }
+    transact(y.doc, opts, () => {
+      if (
+        isObject(pv) &&
+        pv2yvCache.has(pv) &&
+        pv2yvCache.get(pv) === y.get(k)
+      ) {
+        return;
+      }
+      if (Array.isArray(pv)) {
+        const yv = new Y.Array();
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYArray(pv, yv, opts);
+        y.set(k, yv as unknown as T);
+      } else if (isObject(pv)) {
+        const yv = new Y.Map();
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYMap(pv, yv, opts);
+        y.set(k, yv as unknown as T);
+      } else if (isPrimitiveMapValue(pv)) {
+        y.set(k, pv);
+      } else {
+        throw new Error('unsupported p type');
+      }
+    });
   };
 
   const setYValueToP = (yv: T, k: string) => {
@@ -47,12 +69,12 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
     if (yv instanceof Y.Array) {
       const pv = proxy([]);
       pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv);
+      bindProxyAndYArray(pv, yv, opts);
       p[k] = pv as unknown as T;
     } else if (yv instanceof Y.Map) {
       const pv = proxy(yv.toJSON());
       pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv);
+      bindProxyAndYMap(pv, yv, opts);
       p[k] = pv as unknown as T;
     } else if (isPrimitiveMapValue(yv)) {
       p[k] = yv;
@@ -70,7 +92,7 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       deepEqual(pv, yv.toJSON())
     ) {
       pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv);
+      bindProxyAndYArray(pv, yv, opts);
     } else if (
       !Array.isArray(pv) &&
       isObject(pv) &&
@@ -78,7 +100,7 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       deepEqual(pv, yv.toJSON())
     ) {
       pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv);
+      bindProxyAndYMap(pv, yv, opts);
     } else {
       setPValueToY(pv, k);
     }
@@ -93,7 +115,7 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       deepEqual(pv, yv.toJSON())
     ) {
       pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv);
+      bindProxyAndYArray(pv, yv, opts);
     } else if (
       !Array.isArray(pv) &&
       isObject(pv) &&
@@ -101,7 +123,7 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
       deepEqual(pv, yv.toJSON())
     ) {
       pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv);
+      bindProxyAndYMap(pv, yv, opts);
     } else {
       setYValueToP(yv, k);
     }
@@ -137,19 +159,23 @@ export const bindProxyAndYMap = <T>(p: Record<string, T>, y: Y.Map<T>) => {
   });
 };
 
-export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
+export const bindProxyAndYArray = <T>(
+  p: T[],
+  y: Y.Array<T>,
+  opts: Options = { transactionOrigin: null },
+) => {
   const pv2yvCache = new WeakMap<object, unknown>();
 
   const insertPValueToY = (pv: T, i: number) => {
     if (Array.isArray(pv)) {
       const yv = new Y.Array();
       pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv);
+      bindProxyAndYArray(pv, yv, opts);
       y.insert(i, [yv as unknown as T]);
     } else if (isObject(pv)) {
       const yv = new Y.Map();
       pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv);
+      bindProxyAndYMap(pv, yv, opts);
       y.insert(i, [yv as unknown as T]);
     } else if (isPrimitiveArrayValue(pv)) {
       y.insert(i, [pv]);
@@ -162,7 +188,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
     if (yv instanceof Y.Array) {
       const pv = proxy([]);
       pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv);
+      bindProxyAndYArray(pv, yv, opts);
       p.splice(i, 0, pv as unknown as T);
     } else if (yv instanceof Y.Map) {
       const pv = proxy(yv.toJSON());
@@ -186,7 +212,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
     ) {
       if (pv2yvCache.get(pv) !== yv) {
         pv2yvCache.set(pv, yv);
-        bindProxyAndYArray(pv, yv);
+        bindProxyAndYArray(pv, yv, opts);
       }
     } else if (
       !Array.isArray(pv) &&
@@ -196,7 +222,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
     ) {
       if (pv2yvCache.get(pv) !== yv) {
         pv2yvCache.set(pv, yv);
-        bindProxyAndYMap(pv, yv);
+        bindProxyAndYMap(pv, yv, opts);
       }
     } else if (
       isPrimitiveArrayValue(pv) &&
@@ -219,7 +245,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
     ) {
       if (pv2yvCache.get(pv) !== yv) {
         pv2yvCache.set(pv, yv);
-        bindProxyAndYArray(pv, yv);
+        bindProxyAndYArray(pv, yv, opts);
       }
     } else if (
       !Array.isArray(pv) &&
@@ -229,7 +255,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
     ) {
       if (pv2yvCache.get(pv) !== yv) {
         pv2yvCache.set(pv, yv);
-        bindProxyAndYMap(pv, yv);
+        bindProxyAndYMap(pv, yv, opts);
       }
     } else if (
       isPrimitiveArrayValue(pv) &&
@@ -260,14 +286,7 @@ export const bindProxyAndYArray = <T>(p: T[], y: Y.Array<T>) => {
       return;
     }
     // console.log(arrayOps);
-    const transact = (fn: () => void) => {
-      if (y.doc) {
-        y.doc.transact(fn);
-      } else {
-        fn();
-      }
-    };
-    transact(() => {
+    transact(y.doc, opts, () => {
       arrayOps.forEach((op) => {
         const i = op[1];
         if (op[0] === 'delete') {
