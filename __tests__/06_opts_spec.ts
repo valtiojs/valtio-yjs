@@ -3,7 +3,7 @@ import { proxy } from 'valtio/vanilla';
 import { bindProxyAndYArray, bindProxyAndYMap } from '../src/index';
 
 describe('bindProxyAndYMap options', () => {
-  it('simple map', async () => {
+  it('transactionOrigin is included in Y.Doc events', async () => {
     const doc = new Y.Doc();
     const p = proxy<{ foo?: string }>({});
     const m = doc.getMap('map');
@@ -23,7 +23,7 @@ describe('bindProxyAndYMap options', () => {
 });
 
 describe('bindProxyAndYArray', () => {
-  it('simple array', async () => {
+  it('transactionOrigin is included in Y.Doc events', async () => {
     const doc = new Y.Doc();
     const p = proxy<string[]>([]);
     const a = doc.getArray<string>('arr');
