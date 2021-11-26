@@ -27,22 +27,42 @@ const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
   }
 };
 
+// let i = 0;
+// let _pv: any;
+
 export const bindProxyAndYMap = <T>(
   p: Record<string, T>,
   y: Y.Map<T>,
   opts: Options = { transactionOrigin: null },
 ) => {
-  const pv2yvCache = new WeakMap<object, unknown>();
+  const pv2yvCache = new Map<object, unknown>();
+  // i += 1;
+  // console.log(i);
+  // if (i > 15) {
+  //   process.exit();
+  // }
 
   const setPValueToY = (pv: T, k: string) => {
     transact(y.doc, opts, () => {
+      // console.log('_pv', _pv, pv, _pv === pv, k);
+      // _pv = pv;
       if (
         isObject(pv) &&
         pv2yvCache.has(pv) &&
         pv2yvCache.get(pv) === y.get(k)
       ) {
+        // console.log('a', pv, k);
         return;
       }
+      // console.log(
+      //   'b',
+      //   pv,
+      //   k,
+      //   isObject(pv) ? pv2yvCache.get(pv) : 'no',
+      //   y.get(k) instanceof Y.Map
+      //     ? (y.get(k) as unknown as Y.Map<any>).toJSON()
+      //     : y.get(k),
+      // );
       if (Array.isArray(pv)) {
         const yv = new Y.Array();
         pv2yvCache.set(pv, yv);
@@ -51,8 +71,9 @@ export const bindProxyAndYMap = <T>(
       } else if (isObject(pv)) {
         const yv = new Y.Map();
         pv2yvCache.set(pv, yv);
-        bindProxyAndYMap(pv, yv, opts);
+        // console.log('c', pv, k, 'd', Array.from(pv2yvCache.entries()));
         y.set(k, yv as unknown as T);
+        bindProxyAndYMap(pv, yv, opts);
       } else if (isPrimitiveMapValue(pv)) {
         y.set(k, pv);
       } else {
@@ -74,8 +95,8 @@ export const bindProxyAndYMap = <T>(
     } else if (yv instanceof Y.Map) {
       const pv = proxy(yv.toJSON());
       pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv, opts);
       p[k] = pv as unknown as T;
+      bindProxyAndYMap(pv, yv, opts);
     } else if (isPrimitiveMapValue(yv)) {
       p[k] = yv;
     } else {
@@ -134,6 +155,7 @@ export const bindProxyAndYMap = <T>(
     ops.forEach((op) => {
       const path = op[1];
       if (path.length !== 1) {
+        // console.log('ff', path);
         return;
       }
       const k = path[0] as string;
@@ -141,7 +163,17 @@ export const bindProxyAndYMap = <T>(
         y.delete(k);
       } else if (op[0] === 'set') {
         const pv = p[k];
-        setPValueToY(pv, k);
+        const yv = y.get(k);
+        // console.log(
+        //   'deep',
+        //   pv,
+        //   yv instanceof Y.Map ? yv.toJSON() : yv,
+        //   k,
+        //   deepEqual(yv instanceof Y.Map ? yv.toJSON() : yv, pv),
+        // );
+        if (!deepEqual(yv instanceof Y.Map ? yv.toJSON() : yv, pv)) {
+          setPValueToY(pv, k);
+        }
       }
     });
   });
@@ -149,6 +181,7 @@ export const bindProxyAndYMap = <T>(
   // subscribe y
   y.observe((event) => {
     event.keysChanged.forEach((k) => {
+      // console.log('dd', k);
       const yv = y.get(k);
       if (yv === undefined) {
         delete p[k];
