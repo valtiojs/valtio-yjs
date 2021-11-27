@@ -32,7 +32,7 @@ export const bindProxyAndYMap = <T>(
   y: Y.Map<T>,
   opts: Options = { transactionOrigin: null },
 ) => {
-  const pv2yvCache = new Map<object, unknown>();
+  const pv2yvCache = new WeakMap<object, unknown>();
 
   const setPValueToY = (pv: T, k: string) => {
     transact(y.doc, opts, () => {
