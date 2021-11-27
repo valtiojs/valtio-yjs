@@ -51,8 +51,8 @@ export const bindProxyAndYMap = <T>(
       } else if (isObject(pv)) {
         const yv = new Y.Map();
         pv2yvCache.set(pv, yv);
-        y.set(k, yv as unknown as T);
         bindProxyAndYMap(pv, yv, opts);
+        y.set(k, yv as unknown as T);
       } else if (isPrimitiveMapValue(pv)) {
         y.set(k, pv);
       } else {
