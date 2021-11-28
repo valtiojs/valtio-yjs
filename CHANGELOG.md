@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.1.5] - 2021-11-28
+### Changed
+- Support nested map set (#15)
+
 ## [0.1.4] - 2021-11-23
 ### Changed
 - Add support for transactionOrigin (#13)
