@@ -142,7 +142,7 @@ export const bindProxyAndYMap = <T>(
       } else if (op[0] === 'set') {
         const pv = p[k];
         const yv = y.get(k);
-        if (!deepEqual(yv instanceof Y.Map ? yv.toJSON() : yv, pv)) {
+        if (!deepEqual(yv instanceof Y.AbstractType ? yv.toJSON() : yv, pv)) {
           setPValueToY(pv, k);
         }
       }

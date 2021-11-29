@@ -41,4 +41,19 @@ describe('issue #14', () => {
 
     expect(m.get('items').get('item1').get('color')).toStrictEqual('red');
   });
+
+  it('nested map array property replace', async () => {
+    const doc = new Y.Doc();
+    const p = proxy({ items: { item1: { point: [0, 0] } } });
+    const m = doc.getMap('map');
+
+    bindProxyAndYMap(p, m);
+
+    p.items.item1.point = [100, 100];
+    await Promise.resolve();
+
+    expect(m.get('items').get('item1').get('point').toJSON()).toStrictEqual([
+      100, 100,
+    ]);
+  });
 });
