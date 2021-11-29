@@ -141,7 +141,10 @@ export const bindProxyAndYMap = <T>(
         y.delete(k);
       } else if (op[0] === 'set') {
         const pv = p[k];
-        setPValueToY(pv, k);
+        const yv = y.get(k);
+        if (!deepEqual(yv instanceof Y.AbstractType ? yv.toJSON() : yv, pv)) {
+          setPValueToY(pv, k);
+        }
       }
     });
   });
@@ -285,7 +288,6 @@ export const bindProxyAndYArray = <T>(
     ) {
       return;
     }
-    // console.log(arrayOps);
     transact(y.doc, opts, () => {
       arrayOps.forEach((op) => {
         const i = op[1];
@@ -320,7 +322,6 @@ export const bindProxyAndYArray = <T>(
     ) {
       return;
     }
-    // console.log(JSON.stringify(event.changes));
     let retain = 0;
     event.changes.delta.forEach((item) => {
       if (item.retain) {
