@@ -588,4 +588,54 @@ describe('double operations', () => {
       ['insert', 2, 'e', undefined],
     ]);
   });
+
+  it('moveUp (#7)', async () => {
+    const p = proxy(['a', 'b', 'c', 'd', 'e']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    const [item] = p.splice(2, 1);
+    p.splice(2 - 1, 0, item);
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['2'], 'd', 'c'],
+      ['set', ['3'], 'e', 'd'],
+      ['delete', ['4'], 'e'],
+      ['set', ['length'], 4, 5],
+      ['set', ['4'], 'e', undefined],
+      ['set', ['3'], 'd', 'e'],
+      ['set', ['2'], 'b', 'd'],
+      ['set', ['1'], 'c', 'b'],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['delete', 2, 'c', undefined],
+      ['insert', 1, 'c', undefined],
+    ]);
+  });
+
+  it('moveDown (#7)', async () => {
+    const p = proxy(['a', 'b', 'c', 'd', 'e']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    const [item] = p.splice(2, 1);
+    p.splice(2 + 1, 0, item);
+    await Promise.resolve();
+    expect(lastOps).toEqual([
+      ['set', ['2'], 'd', 'c'],
+      ['set', ['3'], 'e', 'd'],
+      ['delete', ['4'], 'e'],
+      ['set', ['length'], 4, 5],
+      ['set', ['4'], 'e', undefined],
+      ['set', ['3'], 'c', 'e'],
+    ]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['delete', 2, 'c', undefined],
+      ['insert', 3, 'c', undefined],
+    ]);
+  });
 });

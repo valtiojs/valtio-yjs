@@ -277,15 +277,7 @@ export const bindProxyAndYArray = <T>(
   // subscribe p
   subscribe(p, (ops) => {
     const arrayOps = parseProxyOps(ops);
-    if (
-      p.length === y.length &&
-      arrayOps.reduce(
-        (a, c) =>
-          a +
-          (c[0] === 'insert' || (c[0] === 'set' && c[3] === undefined) ? 1 : 0),
-        0,
-      ) !== arrayOps.reduce((a, c) => a + (c[0] === 'delete' ? 1 : 0), 0)
-    ) {
+    if (deepEqual(y.toJSON(), p)) {
       return;
     }
     transact(y.doc, opts, () => {
@@ -315,17 +307,13 @@ export const bindProxyAndYArray = <T>(
 
   // subscribe y
   y.observe((event) => {
-    if (
-      y.length === p.length &&
-      event.changes.delta.reduce((a, c) => a + (c.insert?.length || 0), 0) !==
-        event.changes.delta.reduce((a, c) => a + (c.delete || 0), 0)
-    ) {
+    if (deepEqual(p, y.toJSON())) {
       return;
     }
     let retain = 0;
     event.changes.delta.forEach((item) => {
       if (item.retain) {
-        retain = item.retain;
+        retain += item.retain;
       }
       if (item.delete) {
         p.splice(retain, item.delete);
