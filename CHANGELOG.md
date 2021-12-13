@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.1.7] - 2021-12-13
+### Changed
+- fix: swapping array items (#8)
+
 ## [0.1.6] - 2021-11-29
 ### Changed
 - Fix infinite loop when replacing an array inside a nested map (#16)
