@@ -8,7 +8,7 @@ describe('bindProxyAndYMap options', () => {
     const p = proxy<{ foo?: string }>({});
     const m = doc.getMap('map');
 
-    bindProxyAndYMap(p, m, { transactionOrigin: 'valtio-yjs' });
+    bindProxyAndYMap(p, m, { transactionOrigin: () => 'valtio-yjs' });
 
     const fn = jest.fn();
     doc.on('updateV2', (_: Uint8Array, origin: any) => {
@@ -33,7 +33,7 @@ describe('bindProxyAndYArray', () => {
       fn(origin);
     });
 
-    bindProxyAndYArray(p, a, { transactionOrigin: 'valtio-yjs' });
+    bindProxyAndYArray(p, a, { transactionOrigin: () => 'valtio-yjs' });
 
     p.push('a');
     await Promise.resolve();

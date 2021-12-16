@@ -16,12 +16,16 @@ const isPrimitiveArrayValue = (v: unknown) =>
   typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
 
 type Options = {
-  transactionOrigin?: any;
+  transactionOrigin?: () => any;
 };
 
-const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
+const transact = (
+  doc: Y.Doc | null,
+  transactionOrigin: any,
+  fn: () => void,
+) => {
   if (doc) {
-    doc.transact(fn, opts.transactionOrigin);
+    doc.transact(fn, transactionOrigin);
   } else {
     fn();
   }
@@ -30,12 +34,13 @@ const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
 export const bindProxyAndYMap = <T>(
   p: Record<string, T>,
   y: Y.Map<T>,
-  opts: Options = { transactionOrigin: null },
+  opts: Options = {},
 ) => {
+  const transactionOrigin = opts.transactionOrigin ?? (() => null);
   const pv2yvCache = new WeakMap<object, unknown>();
 
   const setPValueToY = (pv: T, k: string) => {
-    transact(y.doc, opts, () => {
+    transact(y.doc, transactionOrigin(), () => {
       if (
         isObject(pv) &&
         pv2yvCache.has(pv) &&
@@ -165,8 +170,9 @@ export const bindProxyAndYMap = <T>(
 export const bindProxyAndYArray = <T>(
   p: T[],
   y: Y.Array<T>,
-  opts: Options = { transactionOrigin: null },
+  opts: Options = {},
 ) => {
+  const transactionOrigin = opts.transactionOrigin ?? (() => null);
   const pv2yvCache = new WeakMap<object, unknown>();
 
   const insertPValueToY = (pv: T, i: number) => {
@@ -280,7 +286,7 @@ export const bindProxyAndYArray = <T>(
     if (deepEqual(y.toJSON(), p)) {
       return;
     }
-    transact(y.doc, opts, () => {
+    transact(y.doc, transactionOrigin(), () => {
       arrayOps.forEach((op) => {
         const i = op[1];
         if (op[0] === 'delete') {
