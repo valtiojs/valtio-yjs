@@ -16,12 +16,12 @@ const isPrimitiveArrayValue = (v: unknown) =>
   typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
 
 type Options = {
-  transactionOrigin?: any;
+  transactionOrigin?: () => any;
 };
 
 const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
   if (doc) {
-    doc.transact(fn, opts.transactionOrigin);
+    doc.transact(fn, opts.transactionOrigin?.());
   } else {
     fn();
   }
@@ -30,7 +30,7 @@ const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
 export const bindProxyAndYMap = <T>(
   p: Record<string, T>,
   y: Y.Map<T>,
-  opts: Options = { transactionOrigin: null },
+  opts: Options = {},
 ) => {
   const pv2yvCache = new WeakMap<object, unknown>();
 
@@ -165,7 +165,7 @@ export const bindProxyAndYMap = <T>(
 export const bindProxyAndYArray = <T>(
   p: T[],
   y: Y.Array<T>,
-  opts: Options = { transactionOrigin: null },
+  opts: Options = {},
 ) => {
   const pv2yvCache = new WeakMap<object, unknown>();
 
