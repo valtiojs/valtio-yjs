@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2021-12-17
+### Changed
+- Allow variable transactionOrigin value (#18)
+
 ## [0.1.7] - 2021-12-13
 ### Changed
 - fix: swapping array items (#8)
