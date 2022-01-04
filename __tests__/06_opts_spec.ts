@@ -8,13 +8,15 @@ describe('bindProxyAndYMap options', () => {
     const p = proxy<{ foo?: string }>({});
     const m = doc.getMap('map');
 
+    const transactionOrigin = () => {
+      const id = counter;
+      counter += 1;
+      return { id };
+    };
+
     let counter = 0;
     bindProxyAndYMap(p, m, {
-      transactionOrigin: () => {
-        const id = counter;
-        counter += 1;
-        return { id };
-      },
+      transactionOrigin,
     });
 
     const fn = jest.fn();
@@ -24,12 +26,12 @@ describe('bindProxyAndYMap options', () => {
 
     p.foo = 'bar';
     await Promise.resolve();
-    expect(fn).toBeCalledWith({ id: 0 });
+    expect(fn).toBeCalledWith(transactionOrigin);
     fn.mockClear();
 
     p.foo = 'baz';
     await Promise.resolve();
-    expect(fn).toBeCalledWith({ id: 1 });
+    expect(fn).toBeCalledWith(transactionOrigin);
   });
 });
 
@@ -44,10 +46,12 @@ describe('bindProxyAndYArray', () => {
       fn(origin);
     });
 
-    bindProxyAndYArray(p, a, { transactionOrigin: () => 'valtio-yjs' });
+    const transactionOrigin = () => 'valtio-yjs';
+
+    bindProxyAndYArray(p, a, { transactionOrigin });
 
     p.push('a');
     await Promise.resolve();
-    expect(fn).toBeCalledWith('valtio-yjs');
+    expect(fn).toBeCalledWith(transactionOrigin);
   });
 });
