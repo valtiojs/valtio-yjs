@@ -16,12 +16,12 @@ const isPrimitiveArrayValue = (v: unknown) =>
   typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
 
 type Options = {
-  transactionOrigin?: () => any;
+  transactionOrigin?: any;
 };
 
 const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
   if (doc) {
-    doc.transact(fn, opts.transactionOrigin?.());
+    doc.transact(fn, opts.transactionOrigin);
   } else {
     fn();
   }
