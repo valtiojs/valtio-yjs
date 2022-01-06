@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2022-01-06
+### Changed
+- Pass transactionOrigin function through without calling it (#19)
+
 ## [0.2.0] - 2021-12-17
 ### Changed
 - Allow variable transactionOrigin value (#18)
