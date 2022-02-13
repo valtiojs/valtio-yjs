@@ -63,7 +63,7 @@ describe('bindProxyAndYMap', () => {
   it('nested map (from proxy)', async () => {
     const doc = new Y.Doc();
     const p = proxy<{ foo?: { bar?: string } }>({});
-    const m = doc.getMap('map');
+    const m = doc.getMap('map') as any;
 
     bindProxyAndYMap(p, m);
     expect(p.foo).toBe(undefined);
@@ -82,7 +82,7 @@ describe('bindProxyAndYMap', () => {
   it('nested map (from y.map)', async () => {
     const doc = new Y.Doc();
     const p = proxy<{ foo?: { bar?: string } }>({});
-    const m = doc.getMap('map');
+    const m = doc.getMap('map') as any;
 
     bindProxyAndYMap(p, m);
     expect(p.foo).toBe(undefined);

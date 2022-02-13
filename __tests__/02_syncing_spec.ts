@@ -50,11 +50,11 @@ describe('https://codesandbox.io/s/ni1fk', () => {
     });
 
     const p1 = proxy<{ foo?: { bar?: string } }>({});
-    const m1 = doc1.getMap('map');
+    const m1 = doc1.getMap('map') as any;
     bindProxyAndYMap(p1, m1);
 
     const p2 = proxy<{ foo?: { bar?: string } }>({});
-    const m2 = doc2.getMap('map');
+    const m2 = doc2.getMap('map') as any;
     bindProxyAndYMap(p2, m2);
 
     p1.foo = { bar: 'a' };
@@ -87,11 +87,11 @@ describe('nested objects and arrays', () => {
     });
 
     const p1 = proxy<{ texts: string[] }>({ texts: [] });
-    const m1 = doc1.getMap('map');
+    const m1 = doc1.getMap('map') as any;
     bindProxyAndYMap(p1, m1);
 
     const p2 = proxy<{ texts: string[] }>({ texts: [] });
-    const m2 = doc2.getMap('map');
+    const m2 = doc2.getMap('map') as any;
     bindProxyAndYMap(p2, m2);
 
     p1.texts.push('a');

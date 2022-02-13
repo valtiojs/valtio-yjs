@@ -6,7 +6,7 @@ describe('issue #14', () => {
   it('nested map direct set', async () => {
     const doc = new Y.Doc();
     const p = proxy({ items: { item1: { color: 'blue' } } });
-    const m = doc.getMap('map');
+    const m = doc.getMap('map') as any;
 
     bindProxyAndYMap(p, m);
 
@@ -19,7 +19,7 @@ describe('issue #14', () => {
   it('nested map 1 level outer set', async () => {
     const doc = new Y.Doc();
     const p = proxy({ items: { item1: { color: 'blue' } } });
-    const m = doc.getMap('map');
+    const m = doc.getMap('map') as any;
 
     bindProxyAndYMap(p, m);
 
@@ -32,7 +32,7 @@ describe('issue #14', () => {
   it('nested map 2 level outer set', async () => {
     const doc = new Y.Doc();
     const p = proxy({ items: { item1: { color: 'blue' } } });
-    const m = doc.getMap('map');
+    const m = doc.getMap('map') as any;
 
     bindProxyAndYMap(p, m);
 
@@ -45,7 +45,7 @@ describe('issue #14', () => {
   it('nested map array property replace', async () => {
     const doc = new Y.Doc();
     const p = proxy({ items: { item1: { point: [0, 0] } } });
-    const m = doc.getMap('map');
+    const m = doc.getMap('map') as any;
 
     bindProxyAndYMap(p, m);
 
