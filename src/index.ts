@@ -1,4 +1,4 @@
-import { proxy, subscribe } from 'valtio/vanilla';
+import { proxy, subscribe, getVersion } from 'valtio/vanilla';
 import * as Y from 'yjs';
 import deepEqual from 'fast-deep-equal';
 import { parseProxyOps } from './parseProxyOps';
@@ -14,6 +14,9 @@ const isPrimitiveMapValue = (v: unknown) =>
 
 const isPrimitiveArrayValue = (v: unknown) =>
   typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
+
+const isNonProxyObject = (x: unknown) =>
+  isObject(x) && getVersion(x) === undefined;
 
 type Options = {
   transactionOrigin?: any;
@@ -36,6 +39,9 @@ export const bindProxyAndYMap = <T>(
 
   const setPValueToY = (pv: T, k: string) => {
     transact(y.doc, opts, () => {
+      if (isNonProxyObject(pv)) {
+        return;
+      }
       if (
         isObject(pv) &&
         pv2yvCache.has(pv) &&
@@ -85,6 +91,9 @@ export const bindProxyAndYMap = <T>(
 
   // initialize from p
   Object.entries(p).forEach(([k, pv]) => {
+    if (isNonProxyObject(pv)) {
+      return;
+    }
     const yv = y.get(k);
     if (
       Array.isArray(pv) &&
@@ -170,6 +179,9 @@ export const bindProxyAndYArray = <T>(
   const pv2yvCache = new WeakMap<object, unknown>();
 
   const insertPValueToY = (pv: T, i: number) => {
+    if (isNonProxyObject(pv)) {
+      return;
+    }
     if (Array.isArray(pv)) {
       const yv = new Y.Array();
       pv2yvCache.set(pv, yv);
@@ -207,6 +219,9 @@ export const bindProxyAndYArray = <T>(
 
   // initialize from p
   p.forEach((pv, i) => {
+    if (isNonProxyObject(pv)) {
+      return;
+    }
     const yv = y.get(i);
     if (
       Array.isArray(pv) &&
