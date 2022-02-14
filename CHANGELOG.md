@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## [0.3.1] - 2022-02-14
 ### Changed
 - Skip non-proxy objects and only warn the usage (#23)
 
