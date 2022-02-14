@@ -28,7 +28,8 @@
     "no-use-before-define": "off",
     "no-param-reassign": "off",
     "import/prefer-default-export": "off",
-    "prefer-destructuring": "off"
+    "prefer-destructuring": "off",
+    "no-console": "off"
   },
   "overrides": [{
     "files": ["__tests__/**/*"],

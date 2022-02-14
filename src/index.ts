@@ -1,10 +1,13 @@
-import { proxy, subscribe } from 'valtio/vanilla';
+import { proxy, subscribe, getVersion } from 'valtio/vanilla';
 import * as Y from 'yjs';
 import deepEqual from 'fast-deep-equal';
 import { parseProxyOps } from './parseProxyOps';
 
-const isObject = (x: unknown): x is Record<string, unknown> =>
-  typeof x === 'object' && x !== null;
+const isProxyObject = <T>(x: T): x is T & Record<string, unknown> =>
+  typeof x === 'object' && x !== null && getVersion(x) !== undefined;
+
+const isProxyArray = <T>(x: T): x is T & unknown[] =>
+  Array.isArray(x) && getVersion(x) !== undefined;
 
 const isPrimitiveMapValue = (v: unknown) =>
   v === null ||
@@ -37,33 +40,33 @@ export const bindProxyAndYMap = <T>(
   const setPValueToY = (pv: T, k: string) => {
     transact(y.doc, opts, () => {
       if (
-        isObject(pv) &&
+        isProxyObject(pv) &&
         pv2yvCache.has(pv) &&
         pv2yvCache.get(pv) === y.get(k)
       ) {
         return;
       }
-      if (Array.isArray(pv)) {
+      if (isProxyArray(pv)) {
         const yv = new Y.Array();
         pv2yvCache.set(pv, yv);
         bindProxyAndYArray(pv, yv, opts);
         y.set(k, yv as unknown as T);
-      } else if (isObject(pv)) {
+      } else if (isProxyObject(pv)) {
         const yv = new Y.Map();
         pv2yvCache.set(pv, yv);
         bindProxyAndYMap(pv, yv, opts);
         y.set(k, yv as unknown as T);
       } else if (isPrimitiveMapValue(pv)) {
         y.set(k, pv);
-      } else {
-        throw new Error('unsupported p type');
+      } else if (process.env.NODE_ENV !== 'production') {
+        console.warn('unsupported p type', pv);
       }
     });
   };
 
   const setYValueToP = (yv: T, k: string) => {
     const prev = p[k];
-    if (isObject(prev) && pv2yvCache.get(prev) === yv) {
+    if (isProxyObject(prev) && pv2yvCache.get(prev) === yv) {
       return;
     }
     if (yv instanceof Y.Array) {
@@ -78,8 +81,8 @@ export const bindProxyAndYMap = <T>(
       p[k] = pv as unknown as T;
     } else if (isPrimitiveMapValue(yv)) {
       p[k] = yv;
-    } else {
-      throw new Error('unsupported y type');
+    } else if (process.env.NODE_ENV !== 'production') {
+      console.warn('unsupported y type', yv);
     }
   };
 
@@ -87,7 +90,7 @@ export const bindProxyAndYMap = <T>(
   Object.entries(p).forEach(([k, pv]) => {
     const yv = y.get(k);
     if (
-      Array.isArray(pv) &&
+      isProxyArray(pv) &&
       yv instanceof Y.Array &&
       deepEqual(pv, yv.toJSON())
     ) {
@@ -95,7 +98,7 @@ export const bindProxyAndYMap = <T>(
       bindProxyAndYArray(pv, yv, opts);
     } else if (
       !Array.isArray(pv) &&
-      isObject(pv) &&
+      isProxyObject(pv) &&
       yv instanceof Y.Map &&
       deepEqual(pv, yv.toJSON())
     ) {
@@ -110,7 +113,7 @@ export const bindProxyAndYMap = <T>(
   y.forEach((yv, k) => {
     const pv = p[k];
     if (
-      Array.isArray(pv) &&
+      isProxyArray(pv) &&
       yv instanceof Y.Array &&
       deepEqual(pv, yv.toJSON())
     ) {
@@ -118,7 +121,7 @@ export const bindProxyAndYMap = <T>(
       bindProxyAndYArray(pv, yv, opts);
     } else if (
       !Array.isArray(pv) &&
-      isObject(pv) &&
+      isProxyObject(pv) &&
       yv instanceof Y.Map &&
       deepEqual(pv, yv.toJSON())
     ) {
@@ -170,12 +173,12 @@ export const bindProxyAndYArray = <T>(
   const pv2yvCache = new WeakMap<object, unknown>();
 
   const insertPValueToY = (pv: T, i: number) => {
-    if (Array.isArray(pv)) {
+    if (isProxyArray(pv)) {
       const yv = new Y.Array();
       pv2yvCache.set(pv, yv);
       bindProxyAndYArray(pv, yv, opts);
       y.insert(i, [yv as unknown as T]);
-    } else if (isObject(pv)) {
+    } else if (isProxyObject(pv)) {
       const yv = new Y.Map();
       pv2yvCache.set(pv, yv);
       bindProxyAndYMap(pv, yv, opts);
@@ -209,7 +212,7 @@ export const bindProxyAndYArray = <T>(
   p.forEach((pv, i) => {
     const yv = y.get(i);
     if (
-      Array.isArray(pv) &&
+      isProxyArray(pv) &&
       yv instanceof Y.Array &&
       deepEqual(pv, yv.toJSON())
     ) {
@@ -219,7 +222,7 @@ export const bindProxyAndYArray = <T>(
       }
     } else if (
       !Array.isArray(pv) &&
-      isObject(pv) &&
+      isProxyObject(pv) &&
       yv instanceof Y.Map &&
       deepEqual(pv, yv.toJSON())
     ) {
@@ -242,7 +245,7 @@ export const bindProxyAndYArray = <T>(
   y.forEach((yv, i) => {
     const pv = p[i];
     if (
-      Array.isArray(pv) &&
+      isProxyArray(pv) &&
       yv instanceof Y.Array &&
       deepEqual(pv, yv.toJSON())
     ) {
@@ -252,7 +255,7 @@ export const bindProxyAndYArray = <T>(
       }
     } else if (
       !Array.isArray(pv) &&
-      isObject(pv) &&
+      isProxyObject(pv) &&
       yv instanceof Y.Map &&
       deepEqual(pv, yv.toJSON())
     ) {
