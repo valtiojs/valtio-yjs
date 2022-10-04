@@ -20,6 +20,7 @@ const isPrimitiveArrayValue = (v: unknown) =>
 
 type Options = {
   transactionOrigin?: any;
+  init?: ('PROXY' | 'YDOC')[];
 };
 
 const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
@@ -33,7 +34,9 @@ const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
 export const bindProxyAndYMap = <T>(
   p: Record<string, T>,
   y: Y.Map<T>,
-  opts: Options = {},
+  opts: Options = {
+    init: ['PROXY', 'YDOC'],
+  },
 ) => {
   const pv2yvCache = new WeakMap<object, unknown>();
 
@@ -49,12 +52,12 @@ export const bindProxyAndYMap = <T>(
       if (isProxyArray(pv)) {
         const yv = new Y.Array();
         pv2yvCache.set(pv, yv);
-        bindProxyAndYArray(pv, yv, opts);
+        bindProxyAndYArray(pv, yv, { ...opts, init: ['PROXY'] });
         y.set(k, yv as unknown as T);
       } else if (isProxyObject(pv)) {
         const yv = new Y.Map();
         pv2yvCache.set(pv, yv);
-        bindProxyAndYMap(pv, yv, opts);
+        bindProxyAndYMap(pv, yv, { ...opts, init: ['PROXY'] });
         y.set(k, yv as unknown as T);
       } else if (isPrimitiveMapValue(pv)) {
         y.set(k, pv);
@@ -72,12 +75,12 @@ export const bindProxyAndYMap = <T>(
     if (yv instanceof Y.Array) {
       const pv = proxy([]);
       pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv, opts);
+      bindProxyAndYArray(pv, yv, { ...opts, init: ['YDOC'] });
       p[k] = pv as unknown as T;
     } else if (yv instanceof Y.Map) {
       const pv = proxy(yv.toJSON());
       pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv, opts);
+      bindProxyAndYMap(pv, yv, { ...opts, init: ['YDOC'] });
       p[k] = pv as unknown as T;
     } else if (isPrimitiveMapValue(yv)) {
       p[k] = yv;
@@ -87,50 +90,54 @@ export const bindProxyAndYMap = <T>(
   };
 
   // initialize from p
-  Object.entries(p).forEach(([k, pv]) => {
-    const yv = y.get(k);
-    if (
-      isProxyArray(pv) &&
-      yv instanceof Y.Array &&
-      deepEqual(pv, yv.toJSON())
-    ) {
-      pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv, opts);
-    } else if (
-      !Array.isArray(pv) &&
-      isProxyObject(pv) &&
-      yv instanceof Y.Map &&
-      deepEqual(pv, yv.toJSON())
-    ) {
-      pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv, opts);
-    } else {
-      setPValueToY(pv, k);
-    }
-  });
+  if (opts.init?.includes('PROXY')) {
+    Object.entries(p).forEach(([k, pv]) => {
+      const yv = y.get(k);
+      if (
+        isProxyArray(pv) &&
+        yv instanceof Y.Array &&
+        deepEqual(pv, yv.toJSON())
+      ) {
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYArray(pv, yv, { ...opts, init: ['PROXY'] });
+      } else if (
+        !Array.isArray(pv) &&
+        isProxyObject(pv) &&
+        yv instanceof Y.Map &&
+        deepEqual(pv, yv.toJSON())
+      ) {
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYMap(pv, yv, { ...opts, init: ['PROXY'] });
+      } else {
+        setPValueToY(pv, k);
+      }
+    });
+  }
 
   // initialize from y
-  y.forEach((yv, k) => {
-    const pv = p[k];
-    if (
-      isProxyArray(pv) &&
-      yv instanceof Y.Array &&
-      deepEqual(pv, yv.toJSON())
-    ) {
-      pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv, opts);
-    } else if (
-      !Array.isArray(pv) &&
-      isProxyObject(pv) &&
-      yv instanceof Y.Map &&
-      deepEqual(pv, yv.toJSON())
-    ) {
-      pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv, opts);
-    } else {
-      setYValueToP(yv, k);
-    }
-  });
+  if (opts.init?.includes('YDOC')) {
+    y.forEach((yv, k) => {
+      const pv = p[k];
+      if (
+        isProxyArray(pv) &&
+        yv instanceof Y.Array &&
+        deepEqual(pv, yv.toJSON())
+      ) {
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYArray(pv, yv, { ...opts, init: ['YDOC'] });
+      } else if (
+        !Array.isArray(pv) &&
+        isProxyObject(pv) &&
+        yv instanceof Y.Map &&
+        deepEqual(pv, yv.toJSON())
+      ) {
+        pv2yvCache.set(pv, yv);
+        bindProxyAndYMap(pv, yv, { ...opts, init: ['YDOC'] });
+      } else {
+        setYValueToP(yv, k);
+      }
+    });
+  }
 
   // subscribe p
   subscribe(p, (ops) => {
@@ -168,7 +175,9 @@ export const bindProxyAndYMap = <T>(
 export const bindProxyAndYArray = <T>(
   p: T[],
   y: Y.Array<T>,
-  opts: Options = {},
+  opts: Options = {
+    init: ['PROXY', 'YDOC'],
+  },
 ) => {
   const pv2yvCache = new WeakMap<object, unknown>();
 
@@ -176,12 +185,12 @@ export const bindProxyAndYArray = <T>(
     if (isProxyArray(pv)) {
       const yv = new Y.Array();
       pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv, opts);
+      bindProxyAndYArray(pv, yv, { ...opts, init: ['PROXY'] });
       y.insert(i, [yv as unknown as T]);
     } else if (isProxyObject(pv)) {
       const yv = new Y.Map();
       pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv, opts);
+      bindProxyAndYMap(pv, yv, { ...opts, init: ['PROXY'] });
       y.insert(i, [yv as unknown as T]);
     } else if (isPrimitiveArrayValue(pv)) {
       y.insert(i, [pv]);
@@ -194,12 +203,12 @@ export const bindProxyAndYArray = <T>(
     if (yv instanceof Y.Array) {
       const pv = proxy([]);
       pv2yvCache.set(pv, yv);
-      bindProxyAndYArray(pv, yv, opts);
+      bindProxyAndYArray(pv, yv, { ...opts, init: ['YDOC'] });
       p.splice(i, 0, pv as unknown as T);
     } else if (yv instanceof Y.Map) {
       const pv = proxy(yv.toJSON());
       pv2yvCache.set(pv, yv);
-      bindProxyAndYMap(pv, yv);
+      bindProxyAndYMap(pv, yv, { ...opts, init: ['YDOC'] });
       p.splice(i, 0, pv as unknown as T);
     } else if (isPrimitiveArrayValue(yv)) {
       p.splice(i, 0, yv);
@@ -209,70 +218,74 @@ export const bindProxyAndYArray = <T>(
   };
 
   // initialize from p
-  p.forEach((pv, i) => {
-    const yv = y.get(i);
-    if (
-      isProxyArray(pv) &&
-      yv instanceof Y.Array &&
-      deepEqual(pv, yv.toJSON())
-    ) {
-      if (pv2yvCache.get(pv) !== yv) {
-        pv2yvCache.set(pv, yv);
-        bindProxyAndYArray(pv, yv, opts);
+  if (opts.init?.includes('PROXY')) {
+    p.forEach((pv, i) => {
+      const yv = y.get(i);
+      if (
+        isProxyArray(pv) &&
+        yv instanceof Y.Array &&
+        deepEqual(pv, yv.toJSON())
+      ) {
+        if (pv2yvCache.get(pv) !== yv) {
+          pv2yvCache.set(pv, yv);
+          bindProxyAndYArray(pv, yv, { ...opts, init: ['PROXY'] });
+        }
+      } else if (
+        !Array.isArray(pv) &&
+        isProxyObject(pv) &&
+        yv instanceof Y.Map &&
+        deepEqual(pv, yv.toJSON())
+      ) {
+        if (pv2yvCache.get(pv) !== yv) {
+          pv2yvCache.set(pv, yv);
+          bindProxyAndYMap(pv, yv, { ...opts, init: ['PROXY'] });
+        }
+      } else if (
+        isPrimitiveArrayValue(pv) &&
+        isPrimitiveArrayValue(yv) &&
+        pv === yv
+      ) {
+        // do nothing
+      } else {
+        insertPValueToY(pv, i);
       }
-    } else if (
-      !Array.isArray(pv) &&
-      isProxyObject(pv) &&
-      yv instanceof Y.Map &&
-      deepEqual(pv, yv.toJSON())
-    ) {
-      if (pv2yvCache.get(pv) !== yv) {
-        pv2yvCache.set(pv, yv);
-        bindProxyAndYMap(pv, yv, opts);
-      }
-    } else if (
-      isPrimitiveArrayValue(pv) &&
-      isPrimitiveArrayValue(yv) &&
-      pv === yv
-    ) {
-      // do nothing
-    } else {
-      insertPValueToY(pv, i);
-    }
-  });
+    });
+  }
 
   // initialize from y
-  y.forEach((yv, i) => {
-    const pv = p[i];
-    if (
-      isProxyArray(pv) &&
-      yv instanceof Y.Array &&
-      deepEqual(pv, yv.toJSON())
-    ) {
-      if (pv2yvCache.get(pv) !== yv) {
-        pv2yvCache.set(pv, yv);
-        bindProxyAndYArray(pv, yv, opts);
+  if (opts.init?.includes('YDOC')) {
+    y.forEach((yv, i) => {
+      const pv = p[i];
+      if (
+        isProxyArray(pv) &&
+        yv instanceof Y.Array &&
+        deepEqual(pv, yv.toJSON())
+      ) {
+        if (pv2yvCache.get(pv) !== yv) {
+          pv2yvCache.set(pv, yv);
+          bindProxyAndYArray(pv, yv, { ...opts, init: ['YDOC'] });
+        }
+      } else if (
+        !Array.isArray(pv) &&
+        isProxyObject(pv) &&
+        yv instanceof Y.Map &&
+        deepEqual(pv, yv.toJSON())
+      ) {
+        if (pv2yvCache.get(pv) !== yv) {
+          pv2yvCache.set(pv, yv);
+          bindProxyAndYMap(pv, yv, { ...opts, init: ['YDOC'] });
+        }
+      } else if (
+        isPrimitiveArrayValue(pv) &&
+        isPrimitiveArrayValue(yv) &&
+        pv === yv
+      ) {
+        // do nothing
+      } else {
+        insertYValueToP(yv, i);
       }
-    } else if (
-      !Array.isArray(pv) &&
-      isProxyObject(pv) &&
-      yv instanceof Y.Map &&
-      deepEqual(pv, yv.toJSON())
-    ) {
-      if (pv2yvCache.get(pv) !== yv) {
-        pv2yvCache.set(pv, yv);
-        bindProxyAndYMap(pv, yv, opts);
-      }
-    } else if (
-      isPrimitiveArrayValue(pv) &&
-      isPrimitiveArrayValue(yv) &&
-      pv === yv
-    ) {
-      // do nothing
-    } else {
-      insertYValueToP(yv, i);
-    }
-  });
+    });
+  }
 
   // strip p
   p.splice(y.length);
