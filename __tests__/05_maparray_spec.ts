@@ -1,6 +1,6 @@
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bindProxyAndYMap } from '../src/index';
+import { bindProxy } from '../src/index';
 
 describe('issue #4', () => {
   it('map array', async () => {
@@ -11,7 +11,7 @@ describe('issue #4', () => {
     m.set('arr', arr);
     arr.push(['a', 'b']);
 
-    bindProxyAndYMap(p, m);
+    bindProxy(p, m);
 
     expect(m.get('arr').toJSON()).toEqual(['a', 'b']);
     expect(p.arr).toEqual(['a', 'b']);
@@ -27,7 +27,7 @@ describe('issue #11', () => {
     m.set('arr', arr);
     arr.push(['a', 'b']);
 
-    bindProxyAndYMap(p, m);
+    bindProxy(p, m);
 
     expect(m.get('arr').toJSON()).toEqual(['a', 'b']);
     expect(p.arr).toEqual(['a', 'b']);
