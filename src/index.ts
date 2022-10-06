@@ -223,6 +223,9 @@ function insertPValueToY<T>(
         bindProxy(pv, yv, opts);
         y.set(k, yv as unknown as T);
       } else if (isPrimitiveMapValue(pv)) {
+        if (y.get(k) === pv) {
+          return;
+        }
         y.set(k, pv);
       } else if (process.env.NODE_ENV !== 'production') {
         console.warn('unsupported p type', pv);
