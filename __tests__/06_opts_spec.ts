@@ -1,8 +1,8 @@
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bindProxyAndYArray, bindProxyAndYMap } from '../src/index';
+import { bindProxy } from '../src/index';
 
-describe('bindProxyAndYMap options', () => {
+describe('bindProxy options', () => {
   it('transactionOrigin is included in Y.Doc events', async () => {
     const doc = new Y.Doc();
     const p = proxy<{ foo?: string }>({});
@@ -15,7 +15,7 @@ describe('bindProxyAndYMap options', () => {
     };
 
     let counter = 0;
-    bindProxyAndYMap(p, m, {
+    bindProxy(p, m, {
       transactionOrigin,
     });
 
@@ -35,7 +35,7 @@ describe('bindProxyAndYMap options', () => {
   });
 });
 
-describe('bindProxyAndYArray', () => {
+describe('bindProxy', () => {
   it('transactionOrigin is included in Y.Doc events', async () => {
     const doc = new Y.Doc();
     const p = proxy<string[]>([]);
@@ -48,7 +48,7 @@ describe('bindProxyAndYArray', () => {
 
     const transactionOrigin = () => 'valtio-yjs';
 
-    bindProxyAndYArray(p, a, { transactionOrigin });
+    bindProxy(p, a, { transactionOrigin });
 
     p.push('a');
     await Promise.resolve();
