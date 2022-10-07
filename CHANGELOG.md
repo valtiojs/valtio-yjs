@@ -1,8 +1,11 @@
 # Change Log
 
 ## [Unreleased]
+
+## [0.4.0] - 2022-10-07
 ### Changed
 - refactor: use bind api #34
+  - [BREAKING CHANGE] `bindProxyAndYMap` and `bindProxyAndYArray` are combined to `bind`.
 
 ## [0.3.1] - 2022-02-14
 ### Changed
