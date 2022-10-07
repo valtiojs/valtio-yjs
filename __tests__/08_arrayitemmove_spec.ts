@@ -1,13 +1,13 @@
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bindProxy } from '../src/index';
+import { bind } from '../src/index';
 
 describe('issue #7', () => {
   it('array item move up', async () => {
     const p = proxy(['a', 'b', 'c', 'd', 'e']);
     const doc = new Y.Doc();
     const a = doc.getArray('arr');
-    bindProxy(p, a);
+    bind(p, a);
 
     const moveUp = (index: number) => {
       const [item] = p.splice(index, 1);
@@ -29,7 +29,7 @@ describe('issue #7', () => {
     const p = proxy(['a', 'b', 'c', 'd', 'e']);
     const doc = new Y.Doc();
     const a = doc.getArray('arr');
-    bindProxy(p, a);
+    bind(p, a);
 
     const moveDown = (index: number) => {
       const [item] = p.splice(index, 1);

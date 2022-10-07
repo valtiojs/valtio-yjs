@@ -1,14 +1,14 @@
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bindProxy } from '../src/index';
+import { bind } from '../src/index';
 
-describe('bindProxy', () => {
+describe('bind', () => {
   it('simple map', async () => {
     const doc = new Y.Doc();
     const p = proxy<{ foo?: string }>({});
     const m = doc.getMap('map');
 
-    bindProxy(p, m);
+    bind(p, m);
     expect(p.foo).toBe(undefined);
 
     m.set('foo', 'a');
@@ -25,7 +25,7 @@ describe('bindProxy', () => {
     const m = doc.getMap('map');
     m.set('bar', 1);
 
-    bindProxy(p, m);
+    bind(p, m);
     expect(p.foo).toBe('a');
     expect(p.bar).toBe(1);
     expect(m.get('foo')).toBe('a');
@@ -45,7 +45,7 @@ describe('bindProxy', () => {
       foo: null,
     });
     const m = doc.getMap('map');
-    bindProxy(p, m);
+    bind(p, m);
 
     expect(p.foo).toBe(null);
     expect(m.get('foo')).toBe(null);
@@ -65,7 +65,7 @@ describe('bindProxy', () => {
     const p = proxy<{ foo?: { bar?: string } }>({});
     const m = doc.getMap('map') as any;
 
-    bindProxy(p, m);
+    bind(p, m);
     expect(p.foo).toBe(undefined);
     expect(m.get('foo')).toBe(undefined);
 
@@ -84,7 +84,7 @@ describe('bindProxy', () => {
     const p = proxy<{ foo?: { bar?: string } }>({});
     const m = doc.getMap('map') as any;
 
-    bindProxy(p, m);
+    bind(p, m);
     expect(p.foo).toBe(undefined);
     expect(m.get('foo')).toBe(undefined);
 
@@ -100,13 +100,13 @@ describe('bindProxy', () => {
   });
 });
 
-describe('bindProxy', () => {
+describe('bind', () => {
   it('simple array', async () => {
     const doc = new Y.Doc();
     const p = proxy<string[]>([]);
     const a = doc.getArray<string>('arr');
 
-    bindProxy(p, a);
+    bind(p, a);
     expect(p).toEqual([]);
     expect(a.toJSON()).toEqual([]);
 
@@ -126,7 +126,7 @@ describe('bindProxy', () => {
     const p = proxy([10, 11, 12, 13]);
     const a = doc.getArray<number>('arr');
 
-    bindProxy(p, a);
+    bind(p, a);
 
     it('a push', async () => {
       a.push([20]);

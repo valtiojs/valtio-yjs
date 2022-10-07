@@ -30,7 +30,7 @@ const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
   }
 };
 
-export function bindProxy<T>(
+export function bind<T>(
   p: Record<string, T> | T[],
   y: Y.Map<T> | Y.Array<T>,
   opts: Options = {},
@@ -81,7 +81,7 @@ const initializeFromP = <T>(
         deepEqual(pv, yv.toJSON())
       ) {
         pv2yvCache.set(pv, yv);
-        bindProxy(pv, yv, opts);
+        bind(pv, yv, opts);
       } else if (
         !Array.isArray(pv) &&
         isProxyObject(pv) &&
@@ -89,7 +89,7 @@ const initializeFromP = <T>(
         deepEqual(pv, yv.toJSON())
       ) {
         pv2yvCache.set(pv, yv);
-        bindProxy(pv, yv, opts);
+        bind(pv, yv, opts);
       } else {
         insertPValueToY(pv, y, k, pv2yvCache, opts);
       }
@@ -106,7 +106,7 @@ const initializeFromP = <T>(
       ) {
         if (pv2yvCache.get(pv) !== yv) {
           pv2yvCache.set(pv, yv);
-          bindProxy(pv, yv, opts);
+          bind(pv, yv, opts);
         }
       } else if (
         !Array.isArray(pv) &&
@@ -116,7 +116,7 @@ const initializeFromP = <T>(
       ) {
         if (pv2yvCache.get(pv) !== yv) {
           pv2yvCache.set(pv, yv);
-          bindProxy(pv, yv, opts);
+          bind(pv, yv, opts);
         }
       } else if (
         isPrimitiveArrayValue(pv) &&
@@ -146,7 +146,7 @@ const initializeFromY = <T>(
         deepEqual(pv, yv.toJSON())
       ) {
         pv2yvCache.set(pv, yv);
-        bindProxy(pv, yv, opts);
+        bind(pv, yv, opts);
       } else if (
         !Array.isArray(pv) &&
         isProxyObject(pv) &&
@@ -154,7 +154,7 @@ const initializeFromY = <T>(
         deepEqual(pv, yv.toJSON())
       ) {
         pv2yvCache.set(pv, yv);
-        bindProxy(pv, yv, opts);
+        bind(pv, yv, opts);
       } else {
         insertYValueToP(yv, p, k, pv2yvCache, opts);
       }
@@ -171,7 +171,7 @@ const initializeFromY = <T>(
       ) {
         if (pv2yvCache.get(pv) !== yv) {
           pv2yvCache.set(pv, yv);
-          bindProxy(pv, yv, opts);
+          bind(pv, yv, opts);
         }
       } else if (
         !Array.isArray(pv) &&
@@ -181,7 +181,7 @@ const initializeFromY = <T>(
       ) {
         if (pv2yvCache.get(pv) !== yv) {
           pv2yvCache.set(pv, yv);
-          bindProxy(pv, yv, opts);
+          bind(pv, yv, opts);
         }
       } else if (
         isPrimitiveArrayValue(pv) &&
@@ -215,12 +215,12 @@ function insertPValueToY<T>(
       if (isProxyArray(pv)) {
         const yv = new Y.Array();
         pv2yvCache.set(pv, yv);
-        bindProxy(pv, yv, opts);
+        bind(pv, yv, opts);
         y.set(k, yv as unknown as T);
       } else if (isProxyObject(pv)) {
         const yv = new Y.Map();
         pv2yvCache.set(pv, yv);
-        bindProxy(pv, yv, opts);
+        bind(pv, yv, opts);
         y.set(k, yv as unknown as T);
       } else if (isPrimitiveMapValue(pv)) {
         if (y.get(k) === pv) {
@@ -237,12 +237,12 @@ function insertPValueToY<T>(
     if (isProxyArray(pv)) {
       const yv = new Y.Array();
       pv2yvCache.set(pv, yv);
-      bindProxy(pv, yv, opts);
+      bind(pv, yv, opts);
       y.insert(k, [yv as unknown as T]);
     } else if (isProxyObject(pv)) {
       const yv = new Y.Map();
       pv2yvCache.set(pv, yv);
-      bindProxy(pv, yv, opts);
+      bind(pv, yv, opts);
       y.insert(k, [yv as unknown as T]);
     } else if (isPrimitiveArrayValue(pv)) {
       y.insert(k, [pv]);
@@ -267,12 +267,12 @@ function insertYValueToP<T>(
     if (yv instanceof Y.Array) {
       const pv = proxy([]);
       pv2yvCache.set(pv, yv);
-      bindProxy(pv, yv, opts);
+      bind(pv, yv, opts);
       p[k] = pv as unknown as T;
     } else if (yv instanceof Y.Map) {
       const pv = proxy(yv.toJSON());
       pv2yvCache.set(pv, yv);
-      bindProxy(pv, yv, opts);
+      bind(pv, yv, opts);
       p[k] = pv as unknown as T;
     } else if (isPrimitiveMapValue(yv)) {
       p[k] = yv;
@@ -285,12 +285,12 @@ function insertYValueToP<T>(
     if (yv instanceof Y.Array) {
       const pv = proxy([]);
       pv2yvCache.set(pv, yv);
-      bindProxy(pv, yv, opts);
+      bind(pv, yv, opts);
       p.splice(k, 0, pv as unknown as T);
     } else if (yv instanceof Y.Map) {
       const pv = proxy(yv.toJSON());
       pv2yvCache.set(pv, yv);
-      bindProxy(pv, yv, opts);
+      bind(pv, yv, opts);
       p.splice(k, 0, pv as unknown as T);
     } else if (isPrimitiveArrayValue(yv)) {
       p.splice(k, 0, yv);

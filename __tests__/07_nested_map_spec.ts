@@ -1,6 +1,6 @@
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bindProxy } from '../src/index';
+import { bind } from '../src/index';
 
 describe('issue #14', () => {
   it('nested map direct set', async () => {
@@ -8,7 +8,7 @@ describe('issue #14', () => {
     const p = proxy({ items: { item1: { color: 'blue' } } });
     const m = doc.getMap('map') as any;
 
-    bindProxy(p, m);
+    bind(p, m);
 
     p.items.item1.color = 'red';
     await Promise.resolve();
@@ -21,7 +21,7 @@ describe('issue #14', () => {
     const p = proxy({ items: { item1: { color: 'blue' } } });
     const m = doc.getMap('map') as any;
 
-    bindProxy(p, m);
+    bind(p, m);
 
     p.items.item1 = { color: 'red' };
     await Promise.resolve();
@@ -34,7 +34,7 @@ describe('issue #14', () => {
     const p = proxy({ items: { item1: { color: 'blue' } } });
     const m = doc.getMap('map') as any;
 
-    bindProxy(p, m);
+    bind(p, m);
 
     p.items = { item1: { color: 'red' } };
     await Promise.resolve();
@@ -47,7 +47,7 @@ describe('issue #14', () => {
     const p = proxy({ items: { item1: { point: [0, 0] } } });
     const m = doc.getMap('map') as any;
 
-    bindProxy(p, m);
+    bind(p, m);
 
     p.items.item1.point = [100, 100];
     await Promise.resolve();
@@ -64,8 +64,8 @@ describe('issue #14', () => {
     const doc1 = new Y.Doc();
     const doc2 = new Y.Doc();
 
-    bindProxy(proxy1, doc1.getMap('test'));
-    bindProxy(proxy2, doc2.getMap('test'));
+    bind(proxy1, doc1.getMap('test'));
+    bind(proxy2, doc2.getMap('test'));
 
     const listener1 = jest.fn((update) => {
       Y.applyUpdate(doc2, update, 'hello');
