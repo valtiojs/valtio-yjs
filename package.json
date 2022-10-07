@@ -64,5 +64,9 @@
   "peerDependencies": {
     "valtio": "^1.1.0",
     "yjs": "^13.5.11"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "moduleNameMapper": {}
   }
 }
