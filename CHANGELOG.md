@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Changed
+- refactor: use bind api #34
 
 ## [0.3.1] - 2022-02-14
 ### Changed

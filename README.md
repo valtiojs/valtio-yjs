@@ -34,7 +34,7 @@ yarn add valtio-yjs valtio yjs
 ```js
 import * as Y from "yjs";
 import { proxy } from "valtio";
-import { bindProxyAndYMap } from "valtio-yjs";
+import { bind } from "valtio-yjs";
 
 // create a new Y doc
 const ydoc = new Y.Doc();
@@ -46,7 +46,7 @@ const ymap = ydoc.getMap("mymap");
 const state = proxy({});
 
 // bind them
-bindProxyAndYMap(state, ymap);
+bind(state, ymap);
 
 // now you can mutate the state
 state.text = 'hello';
