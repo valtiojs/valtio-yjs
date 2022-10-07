@@ -1,6 +1,6 @@
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bindProxyAndYMap, bindProxyAndYArray } from '../src/index';
+import { bind } from '../src/index';
 
 describe('https://codesandbox.io/s/ni1fk', () => {
   it('update proxy value through ydoc', async () => {
@@ -16,11 +16,11 @@ describe('https://codesandbox.io/s/ni1fk', () => {
 
     const p1 = proxy<{ foo?: string }>({});
     const m1 = doc1.getMap('map');
-    bindProxyAndYMap(p1, m1);
+    bind(p1, m1);
 
     const p2 = proxy<{ foo?: string }>({});
     const m2 = doc2.getMap('map');
-    bindProxyAndYMap(p2, m2);
+    bind(p2, m2);
 
     p1.foo = 'a';
     await Promise.resolve();
@@ -51,11 +51,11 @@ describe('https://codesandbox.io/s/ni1fk', () => {
 
     const p1 = proxy<{ foo?: { bar?: string } }>({});
     const m1 = doc1.getMap('map') as any;
-    bindProxyAndYMap(p1, m1);
+    bind(p1, m1);
 
     const p2 = proxy<{ foo?: { bar?: string } }>({});
     const m2 = doc2.getMap('map') as any;
-    bindProxyAndYMap(p2, m2);
+    bind(p2, m2);
 
     p1.foo = { bar: 'a' };
     await Promise.resolve();
@@ -88,11 +88,11 @@ describe('nested objects and arrays', () => {
 
     const p1 = proxy<{ texts: string[] }>({ texts: [] });
     const m1 = doc1.getMap('map') as any;
-    bindProxyAndYMap(p1, m1);
+    bind(p1, m1);
 
     const p2 = proxy<{ texts: string[] }>({ texts: [] });
     const m2 = doc2.getMap('map') as any;
-    bindProxyAndYMap(p2, m2);
+    bind(p2, m2);
 
     p1.texts.push('a');
     await Promise.resolve();
@@ -124,11 +124,11 @@ describe('nested objects and arrays', () => {
     type FooObj = { foo: string };
     const p1 = proxy<FooObj[]>([]);
     const a1 = doc1.getArray<FooObj>('arr');
-    bindProxyAndYArray(p1, a1);
+    bind(p1, a1);
 
     const p2 = proxy<FooObj[]>([]);
     const a2 = doc2.getArray<FooObj>('arr');
-    bindProxyAndYArray(p2, a2);
+    bind(p2, a2);
 
     p1.push({ foo: 'a' });
     await Promise.resolve();

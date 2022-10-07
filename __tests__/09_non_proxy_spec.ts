@@ -1,8 +1,8 @@
 import * as Y from 'yjs';
 import { proxy, ref } from 'valtio/vanilla';
-import { bindProxyAndYMap } from '../src/index';
+import { bind } from '../src/index';
 
-describe('bindProxyAndYMap', () => {
+describe('bind', () => {
   let savedConsoleWarn: any;
   beforeAll(() => {
     savedConsoleWarn = console.warn;
@@ -17,7 +17,7 @@ describe('bindProxyAndYMap', () => {
     const p = proxy<{ foo?: { bar?: string } }>({});
     const m = doc.getMap('map') as any;
 
-    bindProxyAndYMap(p, m);
+    bind(p, m);
     expect(p.foo).toBe(undefined);
     expect(m.get('foo')).toBe(undefined);
 
@@ -34,7 +34,7 @@ describe('bindProxyAndYMap', () => {
     const p = proxy<{ foo?: string[] }>({});
     const m = doc.getMap('map') as any;
 
-    bindProxyAndYMap(p, m);
+    bind(p, m);
     expect(p.foo).toBe(undefined);
     expect(m.get('foo')).toBe(undefined);
 
