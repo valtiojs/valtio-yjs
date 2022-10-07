@@ -7,7 +7,7 @@ describe('push', () => {
     const a = doc.getArray('arr');
     a.insert(0, ['a', 'b', 'c']);
     expect(a.toJSON()).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -21,7 +21,7 @@ describe('push', () => {
 
     a.push(['d']);
     expect(a.toJSON()).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -30,22 +30,22 @@ describe('push', () => {
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Object {
+        "calls": [
+          [
+            [
+              {
                 "retain": 3,
               },
-              Object {
-                "insert": Array [
+              {
+                "insert": [
                   "d",
                 ],
               },
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -56,7 +56,7 @@ describe('push', () => {
 
     a.push(['e', 'f']);
     expect(a.toJSON()).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -67,14 +67,14 @@ describe('push', () => {
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Object {
+        "calls": [
+          [
+            [
+              {
                 "retain": 4,
               },
-              Object {
-                "insert": Array [
+              {
+                "insert": [
                   "e",
                   "f",
                 ],
@@ -82,8 +82,8 @@ describe('push', () => {
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -96,7 +96,7 @@ describe('push', () => {
   it('proxy array', async () => {
     const p = proxy(['a', 'b', 'c']);
     expect(p).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -109,7 +109,7 @@ describe('push', () => {
     p.push('d');
     await Promise.resolve();
     expect(p).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -118,12 +118,12 @@ describe('push', () => {
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Array [
+        "calls": [
+          [
+            [
+              [
                 "set",
-                Array [
+                [
                   "3",
                 ],
                 "d",
@@ -132,8 +132,8 @@ describe('push', () => {
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -145,7 +145,7 @@ describe('push', () => {
     p.push('e', 'f');
     await Promise.resolve();
     expect(p).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -156,20 +156,20 @@ describe('push', () => {
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Array [
+        "calls": [
+          [
+            [
+              [
                 "set",
-                Array [
+                [
                   "4",
                 ],
                 "e",
                 undefined,
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "5",
                 ],
                 "f",
@@ -178,8 +178,8 @@ describe('push', () => {
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -196,7 +196,7 @@ describe('pop', () => {
     const a = doc.getArray('arr');
     a.insert(0, ['a', 'b', 'c']);
     expect(a.toJSON()).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -210,27 +210,27 @@ describe('pop', () => {
 
     a.delete(a.length - 1);
     expect(a.toJSON()).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Object {
+        "calls": [
+          [
+            [
+              {
                 "retain": 2,
               },
-              Object {
+              {
                 "delete": 1,
               },
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -241,34 +241,34 @@ describe('pop', () => {
 
     a.delete(a.length - 1);
     a.delete(a.length - 1);
-    expect(a.toJSON()).toMatchInlineSnapshot('Array []');
+    expect(a.toJSON()).toMatchInlineSnapshot('[]');
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Object {
+        "calls": [
+          [
+            [
+              {
                 "retain": 1,
               },
-              Object {
+              {
                 "delete": 1,
               },
             ],
           ],
-          Array [
-            Array [
-              Object {
+          [
+            [
+              {
                 "delete": 1,
               },
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
-          Object {
+          {
             "type": "return",
             "value": undefined,
           },
@@ -281,7 +281,7 @@ describe('pop', () => {
   it('proxy array', async () => {
     const p = proxy(['a', 'b', 'c']);
     expect(p).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -294,26 +294,26 @@ describe('pop', () => {
     p.pop();
     await Promise.resolve();
     expect(p).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Array [
+        "calls": [
+          [
+            [
+              [
                 "delete",
-                Array [
+                [
                   "2",
                 ],
                 "c",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "length",
                 ],
                 2,
@@ -322,8 +322,8 @@ describe('pop', () => {
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -335,37 +335,37 @@ describe('pop', () => {
     p.pop();
     p.pop();
     await Promise.resolve();
-    expect(p).toMatchInlineSnapshot('Array []');
+    expect(p).toMatchInlineSnapshot('[]');
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Array [
+        "calls": [
+          [
+            [
+              [
                 "delete",
-                Array [
+                [
                   "1",
                 ],
                 "b",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "length",
                 ],
                 1,
                 2,
               ],
-              Array [
+              [
                 "delete",
-                Array [
+                [
                   "0",
                 ],
                 "a",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "length",
                 ],
                 0,
@@ -374,8 +374,8 @@ describe('pop', () => {
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -392,7 +392,7 @@ describe('unshift', () => {
     const a = doc.getArray('arr');
     a.insert(0, ['a', 'b', 'c']);
     expect(a.toJSON()).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -406,7 +406,7 @@ describe('unshift', () => {
 
     a.insert(0, ['d']);
     expect(a.toJSON()).toMatchInlineSnapshot(`
-      Array [
+      [
         "d",
         "a",
         "b",
@@ -415,19 +415,19 @@ describe('unshift', () => {
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Object {
-                "insert": Array [
+        "calls": [
+          [
+            [
+              {
+                "insert": [
                   "d",
                 ],
               },
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -438,7 +438,7 @@ describe('unshift', () => {
 
     a.insert(0, ['e', 'f']);
     expect(a.toJSON()).toMatchInlineSnapshot(`
-      Array [
+      [
         "e",
         "f",
         "d",
@@ -449,11 +449,11 @@ describe('unshift', () => {
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Object {
-                "insert": Array [
+        "calls": [
+          [
+            [
+              {
+                "insert": [
                   "e",
                   "f",
                 ],
@@ -461,8 +461,8 @@ describe('unshift', () => {
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -475,7 +475,7 @@ describe('unshift', () => {
   it('proxy array', async () => {
     const p = proxy(['a', 'b', 'c']);
     expect(p).toMatchInlineSnapshot(`
-      Array [
+      [
         "a",
         "b",
         "c",
@@ -488,7 +488,7 @@ describe('unshift', () => {
     p.unshift('d');
     await Promise.resolve();
     expect(p).toMatchInlineSnapshot(`
-      Array [
+      [
         "d",
         "a",
         "b",
@@ -497,36 +497,36 @@ describe('unshift', () => {
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Array [
+        "calls": [
+          [
+            [
+              [
                 "set",
-                Array [
+                [
                   "3",
                 ],
                 "c",
                 undefined,
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "2",
                 ],
                 "b",
                 "c",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "1",
                 ],
                 "a",
                 "b",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "0",
                 ],
                 "d",
@@ -535,8 +535,8 @@ describe('unshift', () => {
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -548,7 +548,7 @@ describe('unshift', () => {
     p.unshift('e', 'f');
     await Promise.resolve();
     expect(p).toMatchInlineSnapshot(`
-      Array [
+      [
         "e",
         "f",
         "d",
@@ -559,52 +559,52 @@ describe('unshift', () => {
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Array [
+        "calls": [
+          [
+            [
+              [
                 "set",
-                Array [
+                [
                   "5",
                 ],
                 "c",
                 undefined,
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "4",
                 ],
                 "b",
                 undefined,
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "3",
                 ],
                 "a",
                 "c",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "2",
                 ],
                 "d",
                 "b",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "0",
                 ],
                 "e",
                 "d",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "1",
                 ],
                 "f",
@@ -613,8 +613,8 @@ describe('unshift', () => {
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
@@ -632,7 +632,7 @@ describe('unshift', () => {
     p.unshift('c');
     await Promise.resolve();
     expect(p).toMatchInlineSnapshot(`
-      Array [
+      [
         "c",
         "b",
         "a",
@@ -640,12 +640,12 @@ describe('unshift', () => {
     `);
     expect(listener).toMatchInlineSnapshot(`
       [MockFunction] {
-        "calls": Array [
-          Array [
-            Array [
-              Array [
+        "calls": [
+          [
+            [
+              [
                 "set",
-                Array [
+                [
                   "0",
                 ],
                 "a",
@@ -653,43 +653,43 @@ describe('unshift', () => {
               ],
             ],
           ],
-          Array [
-            Array [
-              Array [
+          [
+            [
+              [
                 "set",
-                Array [
+                [
                   "1",
                 ],
                 "a",
                 undefined,
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "0",
                 ],
                 "b",
                 "a",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "2",
                 ],
                 "a",
                 undefined,
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "1",
                 ],
                 "b",
                 "a",
               ],
-              Array [
+              [
                 "set",
-                Array [
+                [
                   "0",
                 ],
                 "c",
@@ -698,12 +698,12 @@ describe('unshift', () => {
             ],
           ],
         ],
-        "results": Array [
-          Object {
+        "results": [
+          {
             "type": "return",
             "value": undefined,
           },
-          Object {
+          {
             "type": "return",
             "value": undefined,
           },
