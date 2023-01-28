@@ -49,11 +49,11 @@ export function bind<T>(
 
   const pv2yvCache = new WeakMap<object, unknown>();
 
-  // initialize from p
-  initializeFromP(p, y, pv2yvCache, opts);
-
   // initialize from y
   initializeFromY(p, y, pv2yvCache, opts);
+
+  // initialize from p
+  initializeFromP(p, y, pv2yvCache, opts);
 
   if (isProxyArray(p) && y instanceof Y.Array) {
     p.splice(y.length);
