@@ -83,4 +83,33 @@ describe('issue #14', () => {
     expect(listener1).toBeCalledTimes(1);
     expect(listener2).toBeCalledTimes(1);
   });
+
+  it('nested map uses ymap value on bind', async () => {
+    const proxy1 = proxy({ items: { item1: { color: 'blue' } } });
+    const proxy2 = proxy({ items: { item1: { color: 'blue' } } });
+
+    const doc1 = new Y.Doc();
+    const doc2 = new Y.Doc();
+
+    const map1 = doc1.getMap('map') as any;
+    const map2 = doc2.getMap('map') as any;
+
+    doc1.on('update', (update: Uint8Array) => {
+      Y.applyUpdate(doc2, update);
+    });
+    doc2.on('update', (update: Uint8Array) => {
+      Y.applyUpdate(doc1, update);
+    });
+
+    bind(proxy1, map1);
+
+    proxy1.items = { item1: { color: 'red' } };
+    await Promise.resolve();
+    expect(map1.get('items').get('item1').get('color')).toStrictEqual('red');
+
+    bind(proxy2, map2);
+
+    await Promise.resolve();
+    expect(map1.get('items').get('item1').get('color')).toStrictEqual('red');
+  });
 });
