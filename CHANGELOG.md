@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+### Changed
+- Use ymap value on nested map bind initialization #36
 
 ## [0.4.0] - 2022-10-07
 ### Changed
