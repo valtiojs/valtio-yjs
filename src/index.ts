@@ -212,10 +212,8 @@ function subscribeP<T>(
   return subscribe(p, (ops) => {
     transact(y.doc, opts, () => {
       ops.forEach((op) => {
-        const [path, k] = [op[1].slice(0, -1), op[1].at(-1)] as [
-          string[],
-          string,
-        ];
+        const path = op[1].slice(0, -1) as string[];
+        const k = op[1][op[1].length - 1] as string;
         const parent = getNested(p, y, path);
 
         if (parent.y instanceof Y.Map) {
