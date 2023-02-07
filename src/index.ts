@@ -27,25 +27,27 @@ const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
   }
 };
 
-const toSharedValue = (val: any) => {
+const toYValue = (val: any) => {
   if (isProxyArray(val)) {
     const arr = new Y.Array();
     arr.insert(
       0,
-      val.map(toSharedValue).filter((v) => v !== undefined && v !== null),
+      val.map(toYValue).filter((v) => v !== undefined && v !== null),
     );
     return arr;
   }
+
   if (isProxyObject(val)) {
     const map = new Y.Map();
     Object.entries(val).forEach(([key, value]) => {
-      const v = toSharedValue(value);
+      const v = toYValue(value);
       if (v !== undefined) {
         map.set(key, v);
       }
     });
     return map;
   }
+
   if (isPrimitiveMapValue(val)) {
     return val;
   }
@@ -53,19 +55,19 @@ const toSharedValue = (val: any) => {
   return undefined;
 };
 
-const getSharedValue = (yv: any) => {
-  if (yv instanceof Y.Array || yv instanceof Y.Map) {
+const toJSON = (yv: unknown) => {
+  if (yv instanceof Y.AbstractType) {
     return yv.toJSON();
   }
+
   return yv;
 };
 
-function getNested<T>(
+const getNestedValues = <T>(
   p: Record<string, T> | T[],
   y: Y.Map<T> | Y.Array<T>,
   path: (string | number)[],
-) {
-  const keys = [];
+) => {
   let pv: any = p;
   let yv: any = y;
   for (let i = 0; i < path.length; i += 1) {
@@ -73,19 +75,18 @@ function getNested<T>(
     if (yv instanceof Y.Map) {
       pv = pv[k];
       yv = yv.get(k as string);
-      keys.push(k);
     } else if (yv instanceof Y.Array) {
       const index = Number(k);
       pv = pv[k];
       yv = yv.get(index);
-      keys.push(index);
     } else {
       pv = null;
       yv = null;
     }
   }
-  return { p: pv, y: yv, keys };
-}
+
+  return { p: pv, y: yv };
+};
 
 export function bind<T>(
   p: Record<string, T> | T[],
@@ -126,16 +127,16 @@ export function bind<T>(
   };
 }
 
-const initializeFromP = <T>(
+function initializeFromP<T>(
   p: Record<string, T> | T[],
   y: Y.Map<T> | Y.Array<T>,
   opts: Options,
-) => {
+) {
   transact(y.doc, opts, () => {
     if (isProxyObject(p) && y instanceof Y.Map) {
       Object.entries(p).forEach(([k, pv]) => {
         const yv = y.get(k);
-        if (!deepEqual(pv, getSharedValue(yv))) {
+        if (!deepEqual(pv, toJSON(yv))) {
           insertPValueToY(pv, y, k);
         }
       });
@@ -144,51 +145,50 @@ const initializeFromP = <T>(
     if (isProxyArray(p) && y instanceof Y.Array) {
       p.forEach((pv, i) => {
         const yv = y.get(i);
-        if (!deepEqual(pv, getSharedValue(yv))) {
+        if (!deepEqual(pv, toJSON(yv))) {
           insertPValueToY(pv, y, i);
         }
       });
     }
   });
-};
+}
 
-const initializeFromY = <T>(
+function initializeFromY<T>(
   p: Record<string, T> | T[],
   y: Y.Map<T> | Y.Array<T>,
-) => {
+) {
   if (isProxyObject(p) && y instanceof Y.Map) {
     y.forEach((yv, k) => {
-      if (!deepEqual(p[k], getSharedValue(yv))) {
-        p[k] = getSharedValue(yv);
+      if (!deepEqual(p[k], toJSON(yv))) {
+        p[k] = toJSON(yv);
       }
     });
   }
 
   if (isProxyArray(p) && y instanceof Y.Array) {
     y.forEach((yv, i) => {
-      if (!deepEqual(p[i], getSharedValue(yv))) {
+      if (!deepEqual(p[i], toJSON(yv))) {
         insertYValueToP(yv, p, i);
       }
     });
   }
-};
+}
 
 function insertPValueToY<T>(
   pv: T,
   y: Y.Map<T> | Y.Array<T>,
   k: number | string,
 ) {
-  const value = toSharedValue(pv);
-
-  if (value === undefined && process.env.NODE_ENV !== 'production') {
+  const yv = toYValue(pv);
+  if (yv === undefined && process.env.NODE_ENV !== 'production') {
     console.warn('unsupported p type', pv);
     return;
   }
 
   if (y instanceof Y.Map && typeof k === 'string') {
-    y.set(k, value);
+    y.set(k, yv);
   } else if (y instanceof Y.Array && typeof k === 'number') {
-    y.insert(k, isProxyArray(pv) ? value : [value]);
+    y.insert(k, [yv]);
   }
 }
 
@@ -198,9 +198,9 @@ function insertYValueToP<T>(
   k: number | string,
 ) {
   if (isProxyObject(p) && typeof k === 'string') {
-    p[k] = getSharedValue(yv);
+    p[k] = toJSON(yv);
   } else if (isProxyArray(p) && typeof k === 'number') {
-    p.splice(k, 0, getSharedValue(yv));
+    p.splice(k, 0, toJSON(yv));
   }
 }
 
@@ -214,7 +214,7 @@ function subscribeP<T>(
       ops.forEach((op) => {
         const path = op[1].slice(0, -1) as string[];
         const k = op[1][op[1].length - 1] as string;
-        const parent = getNested(p, y, path);
+        const parent = getNestedValues(p, y, path);
 
         if (parent.y instanceof Y.Map) {
           if (op[0] === 'delete') {
@@ -222,12 +222,12 @@ function subscribeP<T>(
           } else if (op[0] === 'set') {
             const pv = parent.p[k];
             const yv = parent.y.get(k);
-            if (!deepEqual(getSharedValue(yv), pv)) {
+            if (!deepEqual(toJSON(yv), pv)) {
               insertPValueToY(pv, parent.y, k);
             }
           }
         } else if (parent.y instanceof Y.Array) {
-          if (deepEqual(getSharedValue(parent.y), parent.p)) {
+          if (deepEqual(toJSON(parent.y), parent.p)) {
             return;
           }
 
@@ -263,7 +263,7 @@ function subscribeY<T>(y: Y.Map<T> | Y.Array<T>, p: Record<string, T> | T[]) {
   const observer = (events: Y.YEvent<any>[]) => {
     events.forEach((event) => {
       const path = event.path;
-      const parent = getNested(p, y, path);
+      const parent = getNestedValues(p, y, path);
 
       if (parent.y instanceof Y.Map) {
         event.changes.keys.forEach((item, k) => {
@@ -275,7 +275,7 @@ function subscribeY<T>(y: Y.Map<T> | Y.Array<T>, p: Record<string, T> | T[]) {
           }
         });
       } else if (parent.y instanceof Y.Array) {
-        if (deepEqual(parent.p, getSharedValue(parent.y))) {
+        if (deepEqual(parent.p, toJSON(parent.y))) {
           return;
         }
 
@@ -301,6 +301,7 @@ function subscribeY<T>(y: Y.Map<T> | Y.Array<T>, p: Record<string, T> | T[]) {
       }
     });
   };
+
   y.observeDeep(observer);
   return () => {
     y.unobserveDeep(observer);

@@ -145,4 +145,39 @@ describe('nested objects and arrays', () => {
     expect((a2.get(1) as unknown as Y.Map<FooObj>).get('foo')).toBe('b');
     expect(p2[1].foo).toBe('b');
   });
+
+  it('array in array', async () => {
+    const doc1 = new Y.Doc();
+    const doc2 = new Y.Doc();
+
+    doc1.on('update', (update: Uint8Array) => {
+      Y.applyUpdate(doc2, update);
+    });
+    doc2.on('update', (update: Uint8Array) => {
+      Y.applyUpdate(doc1, update);
+    });
+
+    const p1 = proxy<string[][]>([]);
+    const a1 = doc1.getArray<string[]>('arr');
+    bind(p1, a1);
+
+    const p2 = proxy<string[][]>([]);
+    const a2 = doc2.getArray<string[]>('arr');
+    bind(p2, a2);
+
+    p1.push(['a']);
+    await Promise.resolve();
+    expect(p1[0][0]).toBe('a');
+    expect((a1.get(0) as unknown as Y.Array<string[]>).get(0)).toBe('a');
+    expect((a2.get(0) as unknown as Y.Array<string[]>).get(0)).toBe('a');
+    expect(p2[0][0]).toBe('a');
+
+    await Promise.resolve();
+    p1.push(['b']);
+    await Promise.resolve();
+    expect(p1[1][0]).toBe('b');
+    expect((a1.get(1) as unknown as Y.Array<string[]>).get(0)).toBe('b');
+    expect((a2.get(1) as unknown as Y.Array<string[]>).get(0)).toBe('b');
+    expect(p2[1][0]).toBe('b');
+  });
 });
