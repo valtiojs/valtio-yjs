@@ -98,6 +98,39 @@ describe('bind', () => {
     expect(p?.foo?.bar).toBe('b');
     expect(m.get('foo').get('bar')).toBe('b');
   });
+
+  it('is a single transaction', async () => {
+    const doc = new Y.Doc();
+    const p = proxy<{ foo?: string; bar?: number }>({ foo: 'a', bar: 5 });
+    const m = doc.getMap('map') as any;
+
+    const listener = jest.fn();
+    doc.on('update', listener);
+
+    bind(p, m);
+
+    expect(listener).toBeCalledTimes(1);
+  });
+
+  it('can unsubscribe', async () => {
+    const doc = new Y.Doc();
+    const p = proxy<{ foo?: string }>({});
+    const m = doc.getMap('map');
+
+    const unsub = bind(p, m);
+
+    unsub();
+    expect(p.foo).toBe(undefined);
+
+    m.set('foo', 'a');
+    expect(m.get('foo')).toBe('a');
+    expect(p.foo).toBe(undefined);
+
+    p.foo = 'b';
+    await Promise.resolve();
+    expect(m.get('foo')).toBe('a');
+    expect(p.foo).toBe('b');
+  });
 });
 
 describe('bind', () => {

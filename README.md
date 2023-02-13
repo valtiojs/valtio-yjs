@@ -46,7 +46,7 @@ const ymap = ydoc.getMap("mymap");
 const state = proxy({});
 
 // bind them
-bind(state, ymap);
+const unbind = bind(state, ymap);
 
 // now you can mutate the state
 state.text = 'hello';
@@ -62,6 +62,9 @@ state.arr = [1, 2, 3];
 
 // mutating the array is also possible
 state.arr.push(4);
+
+// unbind them by calling the result
+unbind();
 ```
 
 ## Demos
