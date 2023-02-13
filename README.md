@@ -1,6 +1,6 @@
 # valtio-yjs 💊🚀
 
-[![CI](https://img.shields.io/github/actions/workflow/status/dai-shi/valti-yjs/ci.yml?branch=main)](https://github.com/dai-shi/valti-yjs/actions?query=workflow%3ACI)
+[![CI](https://img.shields.io/github/actions/workflow/status/dai-shi/valtio-yjs/ci.yml?branch=main)](https://github.com/dai-shi/valtio-yjs/actions?query=workflow%3ACI)
 [![npm](https://img.shields.io/npm/v/valtio-yjs)](https://www.npmjs.com/package/valtio-yjs)
 [![size](https://img.shields.io/bundlephobia/minzip/valtio-yjs)](https://bundlephobia.com/result?p=valtio-yjs)
 [![discord](https://img.shields.io/discord/627656437971288081)](https://discord.gg/MrQdmzd)
