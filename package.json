@@ -26,7 +26,7 @@
     "dist"
   ],
   "scripts": {
-    "compile": "microbundle build -f modern,umd",
+    "compile": "microbundle build -f modern,umd --globals valtio/vanilla=valtioVanilla",
     "postcompile": "cp dist/index.modern.mjs dist/index.modern.js && cp dist/index.modern.mjs.map dist/index.modern.js.map",
     "test": "run-s eslint tsc-test jest",
     "eslint": "eslint --ext .js,.ts,.tsx --ignore-pattern dist .",
