@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## [0.5.0] - 2023-02-14
 ## Added
 - refactor to use root level subscriptions #37
 
