@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "es5",
+    "target": "esnext",
+    "downlevelIteration": true,
     "esModuleInterop": true,
     "module": "es2015",
     "moduleResolution": "node",
-    "lib": ["esnext", "dom"],
+    "allowJs": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noUncheckedIndexedAccess": false, /* FIXME can we make it true? */
-    "exactOptionalPropertyTypes": true,
-    "sourceMap": true,
-    "outDir": "./dist"
+    "exactOptionalPropertyTypes": true
   }
 }
