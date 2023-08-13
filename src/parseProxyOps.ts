@@ -1,21 +1,32 @@
 import { subscribe } from 'valtio/vanilla';
 
 type Op = Parameters<Parameters<typeof subscribe>[1]>[0][number];
-type ArrayOp = [
+export type ArrayOp = [
   op: 'insert' | 'set' | 'delete',
   index: number,
   value1: unknown,
   value2: unknown,
 ];
-
-export const parseProxyOps = (ops: Op[]): ArrayOp[] => {
-  const arrayOps: ArrayOp[] = ops.flatMap((op) => {
-    if (op[0] === 'resolve' || op[0] === 'reject') return [];
-    const index = Number(op[1][op[1].length - 1]);
-    if (!Number.isFinite(index)) return [];
-    return [[op[0], index, op[2], op[3]]];
+export const parseProxyOps = (ops: Op[]): Record<string, ArrayOp[]> => {
+  const collated: Record<string, ArrayOp[]> = {};
+  for (let idx = 0; idx < ops.length; idx += 1) {
+    const op = ops[idx];
+    if (!(op[0] === 'resolve' || op[0] === 'reject')) {
+      const index = Number(op[1][op[1].length - 1]);
+      if (Number.isFinite(index)) {
+        const path = op[1].slice(0, -1).join('.') as string;
+        const item: ArrayOp = [op[0], index, op[2], op[3]];
+        if (!collated[path]) collated[path] = [item];
+        else collated[path].push(item);
+      }
+    }
+  }
+  Object.keys(collated).forEach((key) => {
+    collated[key] = parseProxyOpsInternal(collated[key]);
   });
-
+  return collated;
+};
+const parseProxyOpsInternal = (arrayOps: ArrayOp[]): ArrayOp[] => {
   const findCorrespondingInsert = (
     startOpIndex: number,
     startArrayIndex: number,

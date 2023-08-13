@@ -1,7 +1,7 @@
 import { subscribe, getVersion } from 'valtio/vanilla';
 import * as Y from 'yjs';
 import deepEqual from 'fast-deep-equal';
-import { parseProxyOps } from './parseProxyOps';
+import { parseProxyOps, type ArrayOp } from './parseProxyOps';
 
 const isProxyObject = (x: unknown): x is Record<string, unknown> =>
   typeof x === 'object' && x !== null && getVersion(x) !== undefined;
@@ -59,7 +59,6 @@ const toJSON = (yv: unknown) => {
   if (yv instanceof Y.AbstractType) {
     return yv.toJSON();
   }
-
   return yv;
 };
 
@@ -211,6 +210,7 @@ function subscribeP<T>(
 ) {
   return subscribe(p, (ops) => {
     transact(y.doc, opts, () => {
+      let arrayOpsAll: Record<string, ArrayOp[]> | undefined;
       ops.forEach((op) => {
         const path = op[1].slice(0, -1) as string[];
         const k = op[1][op[1].length - 1] as string;
@@ -230,11 +230,16 @@ function subscribeP<T>(
           if (deepEqual(toJSON(parent.y), parent.p)) {
             return;
           }
-
-          const arrayOps = parseProxyOps(ops);
+          if (!arrayOpsAll) {
+            arrayOpsAll = parseProxyOps(ops);
+          }
+          const pathkey = path.join('.');
+          if (!(pathkey in arrayOpsAll)) return;
+          const arrayOps = arrayOpsAll[pathkey];
+          delete arrayOpsAll[pathkey];
           arrayOps.forEach((aOp) => {
-            const i = aOp[1];
-            if (aOp[0] === 'delete') {
+            const [action, i] = aOp;
+            if (action === 'delete') {
               if (parent.y.length > i) {
                 parent.y.delete(i, 1);
               }
@@ -244,12 +249,12 @@ function subscribeP<T>(
             if (pv === undefined) {
               return;
             }
-            if (aOp[0] === 'set') {
+            if (action === 'set') {
               if (parent.y.length > i) {
                 parent.y.delete(i, 1);
               }
               insertPValueToY(pv, parent.y, i);
-            } else if (aOp[0] === 'insert') {
+            } else if (action === 'insert') {
               insertPValueToY(pv, parent.y, i);
             }
           });
