@@ -147,4 +147,76 @@ describe('issue #14', () => {
     expect(listener1).toBeCalledTimes(2);
     expect(listener2).toBeCalledTimes(2);
   });
+
+  it('nested map delete', async () => {
+    type State = Record<
+      'items',
+      {
+        [key: string]: {
+          color: string;
+        };
+      }
+    >;
+    const doc = new Y.Doc();
+    const p = proxy<State>({
+      items: { item1: { color: 'blue' }, item2: { color: 'red' } },
+    });
+    const m = doc.getMap('map') as any;
+
+    bind(p, m);
+
+    delete p.items.item1;
+    await Promise.resolve();
+
+    expect(m.get('items').get('item1')).toBeUndefined();
+    expect(m.get('items').get('item2')).toBeDefined();
+  });
+
+  it('nested map delete child and parent', async () => {
+    type State = Record<
+      'parents',
+      {
+        [key: string]: Record<
+          'children',
+          {
+            [key: string]: {
+              color: string;
+            };
+          }
+        >;
+      }
+    >;
+    const doc = new Y.Doc();
+    const p = proxy<State>({
+      parents: {
+        parent1: {
+          children: {
+            child1: { color: 'blue' },
+          },
+        },
+        parent2: {
+          children: {
+            child2: { color: 'red' },
+          },
+        },
+      },
+    });
+    const m = doc.getMap('map') as any;
+
+    bind(p, m);
+
+    delete p.parents.parent1.children.child1;
+    delete p.parents.parent1;
+    await Promise.resolve();
+
+    expect(m.toJSON()).toStrictEqual({
+      parents: {
+        parent2: {
+          children: {
+            child2: { color: 'red' },
+          },
+        },
+      },
+    });
+  });
 });

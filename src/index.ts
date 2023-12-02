@@ -73,9 +73,13 @@ const getNestedValues = <T>(
   for (let i = 0; i < path.length; i += 1) {
     const k = path[i];
     if (yv instanceof Y.Map) {
+      // child may already be deleted
+      if (!pv) break;
       pv = pv[k];
       yv = yv.get(k as string);
     } else if (yv instanceof Y.Array) {
+      // child may already be deleted
+      if (!pv) break;
       const index = Number(k);
       pv = pv[k];
       yv = yv.get(index);
