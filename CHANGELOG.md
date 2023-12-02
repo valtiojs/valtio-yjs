@@ -2,8 +2,12 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2023-12-02
+### Changed
+- fix: guard against deleted parent and child #42
+
 ## [0.5.0] - 2023-02-14
-## Added
+### Added
 - refactor to use root level subscriptions #37
 
 ## [0.4.1] - 2023-01-29
