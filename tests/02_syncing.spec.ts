@@ -1,6 +1,9 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+
+import { describe, expect, it } from 'vitest';
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bind } from '../src/index';
+import { bind } from 'valtio-yjs';
 
 describe('https://codesandbox.io/s/ni1fk', () => {
   it('update proxy value through ydoc', async () => {
@@ -132,18 +135,18 @@ describe('nested objects and arrays', () => {
 
     p1.push({ foo: 'a' });
     await Promise.resolve();
-    expect(p1[0].foo).toBe('a');
+    expect(p1[0]!.foo).toBe('a');
     expect((a1.get(0) as unknown as Y.Map<FooObj>).get('foo')).toBe('a');
     expect((a2.get(0) as unknown as Y.Map<FooObj>).get('foo')).toBe('a');
-    expect(p2[0].foo).toBe('a');
+    expect(p2[0]!.foo).toBe('a');
 
     await Promise.resolve();
     p1.push({ foo: 'b' });
     await Promise.resolve();
-    expect(p1[1].foo).toBe('b');
+    expect(p1[1]!.foo).toBe('b');
     expect((a1.get(1) as unknown as Y.Map<FooObj>).get('foo')).toBe('b');
     expect((a2.get(1) as unknown as Y.Map<FooObj>).get('foo')).toBe('b');
-    expect(p2[1].foo).toBe('b');
+    expect(p2[1]!.foo).toBe('b');
   });
 
   it('array in array', async () => {
@@ -167,17 +170,17 @@ describe('nested objects and arrays', () => {
 
     p1.push(['a']);
     await Promise.resolve();
-    expect(p1[0][0]).toBe('a');
+    expect(p1[0]![0]).toBe('a');
     expect((a1.get(0) as unknown as Y.Array<string[]>).get(0)).toBe('a');
     expect((a2.get(0) as unknown as Y.Array<string[]>).get(0)).toBe('a');
-    expect(p2[0][0]).toBe('a');
+    expect(p2[0]![0]).toBe('a');
 
     await Promise.resolve();
     p1.push(['b']);
     await Promise.resolve();
-    expect(p1[1][0]).toBe('b');
+    expect(p1[1]![0]).toBe('b');
     expect((a1.get(1) as unknown as Y.Array<string[]>).get(0)).toBe('b');
     expect((a2.get(1) as unknown as Y.Array<string[]>).get(0)).toBe('b');
-    expect(p2[1][0]).toBe('b');
+    expect(p2[1]![0]).toBe('b');
   });
 });

@@ -1,6 +1,9 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+
+import { describe, expect, it, vi } from 'vitest';
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bind } from '../src/index';
+import { bind } from 'valtio-yjs';
 
 describe('issue #14', () => {
   it('nested map direct set', async () => {
@@ -67,11 +70,11 @@ describe('issue #14', () => {
     bind(proxy1, doc1.getMap('test'));
     bind(proxy2, doc2.getMap('test'));
 
-    const listener1 = jest.fn((update) => {
+    const listener1 = vi.fn((update) => {
       Y.applyUpdate(doc2, update, 'hello');
     });
 
-    const listener2 = jest.fn();
+    const listener2 = vi.fn();
 
     doc1.on('update', listener1);
     doc2.on('update', listener2);
@@ -123,8 +126,8 @@ describe('issue #14', () => {
     const map1 = doc1.getMap('map') as any;
     const map2 = doc2.getMap('map') as any;
 
-    const listener1 = jest.fn();
-    const listener2 = jest.fn();
+    const listener1 = vi.fn();
+    const listener2 = vi.fn();
 
     doc1.on('update', (update: Uint8Array) => {
       Y.applyUpdate(doc2, update);
@@ -205,7 +208,7 @@ describe('issue #14', () => {
 
     bind(p, m);
 
-    delete p.parents.parent1.children.child1;
+    delete p.parents.parent1!.children.child1;
     delete p.parents.parent1;
     await Promise.resolve();
 

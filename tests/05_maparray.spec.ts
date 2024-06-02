@@ -1,6 +1,9 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+
+import { describe, expect, it } from 'vitest';
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bind } from '../src/index';
+import { bind } from 'valtio-yjs';
 
 describe('issue #4', () => {
   it('map array', async () => {

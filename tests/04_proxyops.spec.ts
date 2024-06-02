@@ -1,5 +1,8 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+
+import { describe, expect, it } from 'vitest';
 import { proxy, subscribe } from 'valtio/vanilla';
-import { parseProxyOps } from '../src/parseProxyOps';
+import { parseProxyOps } from '../src/parseProxyOps.js';
 
 describe('single operation', () => {
   it('push', async () => {
@@ -597,7 +600,7 @@ describe('double operations', () => {
     });
 
     const [item] = p.splice(2, 1);
-    p.splice(2 - 1, 0, item);
+    p.splice(2 - 1, 0, item!);
     await Promise.resolve();
     expect(lastOps).toEqual([
       ['set', ['2'], 'd', 'c'],
@@ -623,7 +626,7 @@ describe('double operations', () => {
     });
 
     const [item] = p.splice(2, 1);
-    p.splice(2 + 1, 0, item);
+    p.splice(2 + 1, 0, item!);
     await Promise.resolve();
     expect(lastOps).toEqual([
       ['set', ['2'], 'd', 'c'],

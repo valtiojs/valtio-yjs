@@ -1,6 +1,9 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+
+import { describe, expect, it, vi } from 'vitest';
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bind } from '../src/index';
+import { bind } from 'valtio-yjs';
 
 describe('bind options', () => {
   it('transactionOrigin is included in Y.Doc events', async () => {
@@ -19,7 +22,7 @@ describe('bind options', () => {
       transactionOrigin,
     });
 
-    const fn = jest.fn();
+    const fn = vi.fn();
     doc.on('updateV2', (_: Uint8Array, origin: any) => {
       fn(origin);
     });
@@ -41,7 +44,7 @@ describe('bind', () => {
     const p = proxy<string[]>([]);
     const a = doc.getArray<string>('arr');
 
-    const fn = jest.fn();
+    const fn = vi.fn();
     doc.on('updateV2', (_: Uint8Array, origin: any) => {
       fn(origin);
     });

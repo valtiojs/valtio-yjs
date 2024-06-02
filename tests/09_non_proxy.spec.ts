@@ -1,6 +1,9 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import * as Y from 'yjs';
 import { proxy, ref } from 'valtio/vanilla';
-import { bind } from '../src/index';
+import { bind } from 'valtio-yjs';
 
 describe('bind', () => {
   let savedConsoleWarn: any;
@@ -12,7 +15,7 @@ describe('bind', () => {
   });
 
   it('does not error with ref object', async () => {
-    console.warn = jest.fn();
+    console.warn = vi.fn();
     const doc = new Y.Doc();
     const p = proxy<{ foo?: { bar?: string } }>({});
     const m = doc.getMap('map') as any;
@@ -29,7 +32,7 @@ describe('bind', () => {
   });
 
   it('does not error with ref array', async () => {
-    console.warn = jest.fn();
+    console.warn = vi.fn();
     const doc = new Y.Doc();
     const p = proxy<{ foo?: string[] }>({});
     const m = doc.getMap('map') as any;

@@ -1,6 +1,9 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+
+import { describe, expect, it } from 'vitest';
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bind } from '../src/index';
+import { bind } from 'valtio-yjs';
 
 describe('issue #7', () => {
   it('array item move up', async () => {
@@ -11,7 +14,7 @@ describe('issue #7', () => {
 
     const moveUp = (index: number) => {
       const [item] = p.splice(index, 1);
-      p.splice(index - 1, 0, item);
+      p.splice(index - 1, 0, item!);
     };
 
     moveUp(2);
@@ -33,7 +36,7 @@ describe('issue #7', () => {
 
     const moveDown = (index: number) => {
       const [item] = p.splice(index, 1);
-      p.splice(index + 1, 0, item);
+      p.splice(index + 1, 0, item!);
     };
 
     moveDown(2);

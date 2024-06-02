@@ -1,0 +1,27 @@
+{
+  "name": "example",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@react-three/cannon": "latest",
+    "@react-three/drei": "latest",
+    "@react-three/fiber": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "three": "latest",
+    "valtio": "latest",
+    "valtio-yjs": "latest",
+    "y-webrtc": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/three": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  },
+  "scripts": {
+    "dev": "vite"
+  }
+}
