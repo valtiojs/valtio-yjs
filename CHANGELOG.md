@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Module-first setup #48
+
 ## [0.5.1] - 2023-12-02
 
 ### Changed
