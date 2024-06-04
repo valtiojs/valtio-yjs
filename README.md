@@ -32,15 +32,15 @@ yarn add valtio-yjs valtio yjs
 ## How to use it
 
 ```js
-import * as Y from "yjs";
-import { proxy } from "valtio";
-import { bind } from "valtio-yjs";
+import * as Y from 'yjs';
+import { proxy } from 'valtio';
+import { bind } from 'valtio-yjs';
 
 // create a new Y doc
 const ydoc = new Y.Doc();
 
 // create a Y map
-const ymap = ydoc.getMap("mymap");
+const ymap = ydoc.getMap('mymap');
 
 // create a valtio state
 const state = proxy({});
@@ -73,7 +73,6 @@ Using `useSnapshot` in valtio and
 `WebsocketProvider` in [y-websocket](https://github.com/yjs/y-websocket),
 we can create multi-client React apps pretty easily.
 
-- [Messages object](https://codesandbox.io/s/valtio-yjs-demo-ox3iy)
-- [Messages array](https://codesandbox.io/s/valtio-yjs-array-demo-j1wkp)
-- [Minecraft + webrtc](https://codesandbox.io/s/minecraft-valtio-yjs-demo-656tq)
-- (...open a PR to add your demos)
+- [Messages object](https://stackblitz.com/github/valtiojs/valtio-yjs/tree/main/examples/01_obj)
+- [Messages array](https://stackblitz.com/github/valtiojs/valtio-yjs/tree/main/examples/02_array)
+- [Minecraft + webrtc](https://stackblitz.com/github/valtiojs/valtio-yjs/tree/main/examples/03_minecraft)

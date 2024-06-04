@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import * as Y from 'yjs';
 import { proxy, subscribe } from 'valtio/vanilla';
 
@@ -14,7 +15,7 @@ describe('push', () => {
       ]
     `);
 
-    const listener = jest.fn();
+    const listener = vi.fn();
     a.observe((event) => {
       listener(event.changes.delta);
     });
@@ -29,7 +30,7 @@ describe('push', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -66,7 +67,7 @@ describe('push', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -103,7 +104,7 @@ describe('push', () => {
       ]
     `);
 
-    const listener = jest.fn();
+    const listener = vi.fn();
     subscribe(p, listener);
 
     p.push('d');
@@ -117,7 +118,7 @@ describe('push', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -155,7 +156,7 @@ describe('push', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -203,7 +204,7 @@ describe('pop', () => {
       ]
     `);
 
-    const listener = jest.fn();
+    const listener = vi.fn();
     a.observe((event) => {
       listener(event.changes.delta);
     });
@@ -216,7 +217,7 @@ describe('pop', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -243,7 +244,7 @@ describe('pop', () => {
     a.delete(a.length - 1);
     expect(a.toJSON()).toMatchInlineSnapshot('[]');
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -288,7 +289,7 @@ describe('pop', () => {
       ]
     `);
 
-    const listener = jest.fn();
+    const listener = vi.fn();
     subscribe(p, listener);
 
     p.pop();
@@ -300,7 +301,7 @@ describe('pop', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -337,7 +338,7 @@ describe('pop', () => {
     await Promise.resolve();
     expect(p).toMatchInlineSnapshot('[]');
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -399,7 +400,7 @@ describe('unshift', () => {
       ]
     `);
 
-    const listener = jest.fn();
+    const listener = vi.fn();
     a.observe((event) => {
       listener(event.changes.delta);
     });
@@ -414,7 +415,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -448,7 +449,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -482,7 +483,7 @@ describe('unshift', () => {
       ]
     `);
 
-    const listener = jest.fn();
+    const listener = vi.fn();
     subscribe(p, listener);
 
     p.unshift('d');
@@ -496,7 +497,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -558,7 +559,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [
@@ -639,7 +640,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction] {
+      [MockFunction spy] {
         "calls": [
           [
             [

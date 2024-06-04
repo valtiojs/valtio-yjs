@@ -1,0 +1,22 @@
+{
+  "name": "example",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest",
+    "valtio": "latest",
+    "valtio-yjs": "latest",
+    "y-websocket": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  },
+  "scripts": {
+    "dev": "vite"
+  }
+}

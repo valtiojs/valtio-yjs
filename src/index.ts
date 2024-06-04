@@ -1,7 +1,9 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+
 import { subscribe, getVersion } from 'valtio/vanilla';
 import * as Y from 'yjs';
 import deepEqual from 'fast-deep-equal';
-import { parseProxyOps } from './parseProxyOps';
+import { parseProxyOps } from './parseProxyOps.js';
 
 const isProxyObject = (x: unknown): x is Record<string, unknown> =>
   typeof x === 'object' && x !== null && getVersion(x) !== undefined;
@@ -75,13 +77,13 @@ const getNestedValues = <T>(
     if (yv instanceof Y.Map) {
       // child may already be deleted
       if (!pv) break;
-      pv = pv[k];
+      pv = pv[k!];
       yv = yv.get(k as string);
     } else if (yv instanceof Y.Array) {
       // child may already be deleted
       if (!pv) break;
       const index = Number(k);
-      pv = pv[k];
+      pv = pv[k!];
       yv = yv.get(index);
     } else {
       pv = null;

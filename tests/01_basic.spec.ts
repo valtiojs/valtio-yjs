@@ -1,6 +1,9 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+
+import { describe, expect, it, vi } from 'vitest';
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bind } from '../src/index';
+import { bind } from 'valtio-yjs';
 
 describe('bind', () => {
   it('simple map', async () => {
@@ -104,7 +107,7 @@ describe('bind', () => {
     const p = proxy<{ foo?: string; bar?: number }>({ foo: 'a', bar: 5 });
     const m = doc.getMap('map') as any;
 
-    const listener = jest.fn();
+    const listener = vi.fn();
     doc.on('update', listener);
 
     bind(p, m);
