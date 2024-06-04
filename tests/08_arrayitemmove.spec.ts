@@ -1,5 +1,3 @@
-/* eslint @typescript-eslint/no-explicit-any: "off" */
-
 import { describe, expect, it } from 'vitest';
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
