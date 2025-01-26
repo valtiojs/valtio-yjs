@@ -1,13 +1,24 @@
 /* eslint react/no-unknown-property: "off" */
+/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 
 import { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
+import type { ThreeElements } from '@react-three/fiber';
 import { Sky, PointerLockControls } from '@react-three/drei';
 import { Physics } from '@react-three/cannon';
 import { Ground } from './ground';
 import { Player } from './player';
 import { Cube, Cubes } from './cube';
 import './styles.css';
+
+declare global {
+  namespace React {
+    namespace JSX {
+      interface IntrinsicElements extends ThreeElements {}
+    }
+  }
+}
 
 // The original was made by Maksim Ivanow: https://www.youtube.com/watch?v=Lc2JvBXMesY&t=124s
 // This demo needs pointer-lock, that works only if you open it in a new window
