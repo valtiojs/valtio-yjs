@@ -10,7 +10,9 @@ type ArrayOp = [
 
 export const parseProxyOps = (ops: Op[]): ArrayOp[] => {
   const arrayOps: ArrayOp[] = ops.flatMap((op) => {
-    if (op[0] === 'resolve' || op[0] === 'reject') return [];
+    if (op[0] === ('resolve' as never) || op[0] === ('reject' as never)) {
+      return [];
+    }
     const index = Number(op[1][op[1].length - 1]);
     if (!Number.isFinite(index)) return [];
     return [[op[0], index, op[2], op[3]]];

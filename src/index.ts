@@ -192,9 +192,9 @@ function insertPValueToY<T>(
   }
 
   if (y instanceof Y.Map && typeof k === 'string') {
-    y.set(k, yv);
+    y.set(k, yv as T);
   } else if (y instanceof Y.Array && typeof k === 'number') {
-    y.insert(k, [yv]);
+    y.insert(k, [yv as T]);
   }
 }
 

@@ -11,6 +11,7 @@ export const Ground = () => {
     rotation: [-Math.PI / 2, 0, 0],
   }));
   const texture = useLoader(THREE.TextureLoader, grass);
+  // eslint-disable-next-line react-compiler/react-compiler
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   return (
     <mesh ref={ref as never /* FIXME proper typing */} receiveShadow>

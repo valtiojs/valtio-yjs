@@ -57,6 +57,7 @@ export const Player = () => {
   const velocity = useRef([0, 0, 0]);
   useEffect(
     () => api.velocity.subscribe((v) => (velocity.current = v)),
+    // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
