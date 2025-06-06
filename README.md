@@ -76,3 +76,11 @@ we can create multi-client React apps pretty easily.
 - [Messages object](https://stackblitz.com/github/valtiojs/valtio-yjs/tree/main/examples/01_obj)
 - [Messages array](https://stackblitz.com/github/valtiojs/valtio-yjs/tree/main/examples/02_array)
 - [Minecraft + webrtc](https://stackblitz.com/github/valtiojs/valtio-yjs/tree/main/examples/03_minecraft)
+
+## Contributing
+
+[![GitHub repo Good Issues for newbies](https://img.shields.io/github/issues/valtiojs/valtio-yjs/good%20first%20issue?style=flat&logo=github&logoColor=green&label=Good%20First%20issues)](https://github.com/valtiojs/valtio-yjs/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) [![GitHub Help Wanted issues](https://img.shields.io/github/issues/valtiojs/valtio-yjs/help%20wanted?style=flat&logo=github&logoColor=b545d1&label=%22Help%20Wanted%22%20issues)](https://github.com/valtiojs/valtio-yjs/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) [![GitHub Help Wanted PRs](https://img.shields.io/github/issues-pr/valtiojs/valtio-yjs/help%20wanted?style=flat&logo=github&logoColor=b545d1&label=%22Help%20Wanted%22%20PRs)](https://github.com/valtiojs/valtio-yjs/pulls?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) [![GitHub repo Issues](https://img.shields.io/github/issues/valtiojs/valtio-yjs?style=flat&logo=github&logoColor=red&label=Issues)](https://github.com/valtiojs/valtio-yjs/issues?q=is%3Aopen)
+
+👋 **Welcome, new contributors!**
+
+Whether you're a seasoned developer or just getting started, your contributions are valuable to us. Don't hesitate to jump in, explore the project, and make an impact. To start contributing, please check out our [Contribution Guidelines](CONTRIBUTING.md). 
