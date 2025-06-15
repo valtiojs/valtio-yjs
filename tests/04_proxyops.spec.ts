@@ -641,4 +641,19 @@ describe('double operations', () => {
       ['insert', 3, 'c', undefined],
     ]);
   });
+
+  it('support mutations on length', async () => {
+    const p = proxy(['a', 'b', 'c']);
+    let lastOps: any;
+    subscribe(p, (ops) => {
+      lastOps = ops;
+    });
+
+    p.length = 2;
+    await Promise.resolve();
+    expect(lastOps).toEqual([['set', ['length'], 2, 3]]);
+    expect(parseProxyOps(lastOps)).toEqual([
+      ['delete', 2, undefined, undefined],
+    ]);
+  });
 });

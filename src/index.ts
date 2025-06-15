@@ -2,8 +2,58 @@
 
 import { subscribe, getVersion } from 'valtio/vanilla';
 import * as Y from 'yjs';
-import deepEqual from 'fast-deep-equal';
 import { parseProxyOps } from './parseProxyOps.js';
+
+function deepEqual(a: any, b: any) {
+  // Adapted from
+  // https://github.com/epoberezkin/fast-deep-equal/blob/a8e7172/src/index.jst
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    if (a.constructor !== b.constructor) return false;
+
+    if (Array.isArray(a)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (let i = length; i-- !== 0; )
+        if (!deepEqual(a[i], b[i])) return false;
+      return true;
+    }
+
+    if (a.constructor === RegExp)
+      return a.source === b.source && a.flags === b.flags;
+    if (a.valueOf !== Object.prototype.valueOf)
+      return a.valueOf() === b.valueOf();
+    if (a.toString !== Object.prototype.toString)
+      return a.toString() === b.toString();
+
+    const keys: string[] = Object.keys(a);
+    length = keys.length;
+    if (length !== Object.keys(b).length) return false;
+
+    for (let i = length; i-- !== 0; )
+      if (!Object.prototype.hasOwnProperty.call(b, keys[i] as string))
+        return false;
+
+    for (let i = length; i-- !== 0; ) {
+      const key = keys[i] as string;
+
+      if (!deepEqual(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  // This case was added to support comparing YJS null values
+  // against JavaScript null/undefined, as YJS doesn't support
+  // undefined values.
+  if ((a === undefined || a === null) && b === null) {
+    return true;
+  }
+
+  // true if both NaN, false otherwise
+  return a !== a && b !== b;
+}
 
 const isProxyObject = (x: unknown): x is Record<string, unknown> =>
   typeof x === 'object' && x !== null && getVersion(x) !== undefined;
@@ -228,15 +278,14 @@ function subscribeP<T>(
           } else if (op[0] === 'set') {
             const pv = parent.p[k];
             const yv = parent.y.get(k);
-            if (!deepEqual(toJSON(yv), pv)) {
+            if (!deepEqual(pv, toJSON(yv))) {
               insertPValueToY(pv, parent.y, k);
             }
           }
         } else if (parent.y instanceof Y.Array) {
-          if (deepEqual(toJSON(parent.y), parent.p)) {
+          if (deepEqual(parent.p, toJSON(parent.y))) {
             return;
           }
-
           const arrayOps = parseProxyOps(ops);
           arrayOps.forEach((aOp) => {
             const i = aOp[1];
@@ -246,9 +295,13 @@ function subscribeP<T>(
               }
               return;
             }
-            const pv = parent.p[i];
+            let pv = parent.p[i];
             if (pv === undefined) {
-              return;
+              if (aOp[0] === 'set' && i < parent.y.length) {
+                return;
+              } else {
+                pv = null;
+              }
             }
             if (aOp[0] === 'set') {
               if (parent.y.length > i) {

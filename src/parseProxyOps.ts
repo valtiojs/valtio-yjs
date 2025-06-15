@@ -9,12 +9,48 @@ type ArrayOp = [
 ];
 
 export const parseProxyOps = (ops: Op[]): ArrayOp[] => {
+  const indexed = new Set<number>();
+  let deleteCount = 0;
+
   const arrayOps: ArrayOp[] = ops.flatMap((op) => {
     if (op[0] === ('resolve' as never) || op[0] === ('reject' as never)) {
       return [];
     }
-    const index = Number(op[1][op[1].length - 1]);
+
+    const key = op[1][op[1].length - 1] as string;
+
+    if (op[0] === 'delete') {
+      deleteCount += 1;
+    }
+    if (key === 'length' && op[0] === 'set') {
+      const newLength = Number(op[2]);
+      const oldLength = Number(op[3]);
+      if (Number.isFinite(newLength) && Number.isFinite(oldLength)) {
+        // Standard deletions emit a 'delete' operation, followed at the end by a 'set'
+        // operation with the new length (which should not be kept, as the delete op
+        // will already take care of changing the length). But direct length mutations
+        // don't emit 'delete' ops and must converted to yjs ops. We simply count how
+        // many deletions are indirectly taken care of by the 'delete' ops, and emit
+        // the remaining if necessary.
+        const toDelete = oldLength - newLength - deleteCount;
+        if (toDelete > 0) {
+          return Array.from(
+            { length: toDelete },
+            () => ['delete', newLength, undefined, undefined] as ArrayOp,
+          );
+        } else if (newLength > oldLength) {
+          return Array.from(
+            { length: newLength - oldLength },
+            () => ['insert', oldLength, null, undefined] as ArrayOp,
+          );
+        }
+      }
+      return [];
+    }
+
+    const index = Number(key);
     if (!Number.isFinite(index)) return [];
+    indexed.add(index);
     return [[op[0], index, op[2], op[3]]];
   });
 
