@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix: support mutation on the length property directly to shrink or extend arrays #51
+
 ## [0.6.0] - 2024-06-04
 
 ### Changed
