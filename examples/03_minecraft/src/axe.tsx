@@ -8,12 +8,12 @@ source: https://sketchfab.com/models/0d62f4d3676545c88ec8523213c055dd
 title: Minecraft Diamond Axe
 */
 
-import type { GroupProps } from '@react-three/fiber';
+import type { ThreeElements } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 // @ts-expect-error no types
 import axeUrl from './assets/axe.glb';
 
-export default function Model(props: GroupProps) {
+export default function Model(props: ThreeElements['group']) {
   const { nodes, materials } = useGLTF(axeUrl);
   return (
     <group dispose={null} {...props}>

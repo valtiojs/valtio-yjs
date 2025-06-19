@@ -23,5 +23,8 @@ export default defineConfig(({ mode }) => {
     root: resolve('examples', DIR),
     server: { port: Number(PORT) },
     plugins: [tsconfigPaths({ root: resolve('.') })],
+    ...(DIR === '03_minecraft' && {
+      assetsInclude: ['**/*.glb'],
+    }),
   };
 });
