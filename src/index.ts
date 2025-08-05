@@ -4,6 +4,8 @@ import { subscribe, getVersion } from 'valtio/vanilla';
 import * as Y from 'yjs';
 import { parseProxyOps } from './parseProxyOps.js';
 
+const NON_SERIALIZABLE_ERROR = new Error('Proxy type must be serializable');
+
 function deepEqual(a: any, b: any) {
   // Adapted from
   // https://github.com/epoberezkin/fast-deep-equal/blob/a8e7172/src/index.jst
@@ -104,7 +106,7 @@ const toYValue = (val: any) => {
     return val;
   }
 
-  return undefined;
+  throw NON_SERIALIZABLE_ERROR;
 };
 
 const toJSON = (yv: unknown) => {
@@ -235,10 +237,18 @@ function insertPValueToY<T>(
   y: Y.Map<T> | Y.Array<T>,
   k: number | string,
 ) {
-  const yv = toYValue(pv);
-  if (yv === undefined && process.env.NODE_ENV !== 'production') {
-    console.warn('unsupported p type', pv);
-    return;
+  let yv;
+  try {
+    yv = toYValue(pv);
+  } catch (error: unknown) {
+    if (error === NON_SERIALIZABLE_ERROR) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('unsupported p type', pv);
+      }
+      return;
+    } else {
+      throw error;
+    }
   }
 
   if (y instanceof Y.Map && typeof k === 'string') {

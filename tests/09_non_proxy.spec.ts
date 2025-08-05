@@ -47,4 +47,21 @@ describe('bind', () => {
     expect(m.get('foo')).toBe(undefined);
     expect(console.warn).toHaveBeenCalledTimes(1);
   });
+
+  it('does not error with Y.Text', async () => {
+    console.warn = vi.fn();
+    const doc = new Y.Doc();
+    const p = proxy<{ foo?: Y.Text }>({});
+    const m = doc.getMap('map') as any;
+
+    bind(p, m);
+    expect(p.foo).toBe(undefined);
+    expect(m.get('foo')).toBe(undefined);
+
+    console.log('aaa');
+    p.foo = new Y.Text();
+    await Promise.resolve();
+    expect(m.get('foo')).toBe(undefined);
+    expect(console.warn).toHaveBeenCalledTimes(1);
+  });
 });
