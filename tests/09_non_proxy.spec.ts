@@ -58,7 +58,6 @@ describe('bind', () => {
     expect(p.foo).toBe(undefined);
     expect(m.get('foo')).toBe(undefined);
 
-    console.log('aaa');
     p.foo = new Y.Text();
     await Promise.resolve();
     expect(m.get('foo')).toBe(undefined);
