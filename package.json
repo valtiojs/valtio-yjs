@@ -1,7 +1,7 @@
 {
   "name": "valtio-yjs",
   "description": "valtio-yjs makes yjs state easy",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "type": "module",
   "author": "Daishi Kato",
   "repository": {

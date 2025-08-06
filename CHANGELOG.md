@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.6.2] - 2025-08-06
+
+### Changed
+
+- fix: toYValue should throw for nested non-serializable value #54
+
 ## [0.6.1] - 2025-06-19
 
 ### Changed
