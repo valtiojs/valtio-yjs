@@ -246,9 +246,8 @@ function insertPValueToY<T>(
         console.warn('unsupported p type', pv);
       }
       return;
-    } else {
-      throw error;
     }
+    throw error;
   }
 
   if (y instanceof Y.Map && typeof k === 'string') {
