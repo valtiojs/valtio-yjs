@@ -2,7 +2,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import * as Y from 'yjs';
-import { proxy } from 'valtio/vanilla';
+import { proxy, subscribe } from 'valtio/vanilla';
 import { bind } from 'valtio-yjs';
 
 describe('issue #14', () => {
@@ -221,5 +221,18 @@ describe('issue #14', () => {
         },
       },
     });
+  });
+});
+
+describe('issue #56', () => {
+  it('no second assign', async () => {
+    const doc = new Y.Doc();
+    const p = proxy({ a: { b: 1, c: 2 } });
+    const sub = vi.fn();
+    subscribe(p, sub, true);
+    bind(p, doc.getMap());
+    p.a = { b: 10, c: 20 };
+    await Promise.resolve();
+    expect(sub).toHaveBeenCalledOnce()
   });
 });
