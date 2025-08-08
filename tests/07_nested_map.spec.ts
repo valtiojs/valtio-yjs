@@ -222,6 +222,15 @@ describe('issue #14', () => {
       },
     });
   });
+
+  it('nested map with undefined value', async () => {
+    const doc = new Y.Doc();
+    const p = proxy<{ a?: { b: number; c: string | undefined } }>({});
+    bind(p, doc.getMap());
+    p.a = { b: 1, c: undefined };
+    await Promise.resolve();
+    expect(doc.getMap().get('a')).toBeDefined();
+  });
 });
 
 describe('issue #56', () => {
