@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as Y from 'yjs';
 import { proxy } from 'valtio/vanilla';
-import { bind } from 'valtio-yjs';
+import { bind, UNDEFINED_YJS_PLACEHOLDER } from 'valtio-yjs';
 
 describe('array length reset', () => {
   it('reset then push', async () => {
@@ -51,7 +51,8 @@ describe('array length reset', () => {
     p.length = 5;
     p[4] = 'e';
     await Promise.resolve();
+    expect(p[3]).toBeUndefined();
     expect(p.toString()).toEqual('a,b,c,,e');
-    expect(a.toJSON()).toEqual(['a', 'b', 'c', null, 'e']);
+    expect(a.toJSON()).toEqual(['a', 'b', 'c', UNDEFINED_YJS_PLACEHOLDER, 'e']);
   });
 });

@@ -53,6 +53,14 @@ function deepEqual(a: any, b: any) {
     return true;
   }
 
+  // case for undefined placeholder for yjs
+  if (
+    (a === undefined && b === UNDEFINED_YJS_PLACEHOLDER) ||
+    (b === undefined && a === UNDEFINED_YJS_PLACEHOLDER)
+  ) {
+    return true;
+  }
+
   // true if both NaN, false otherwise
   return a !== a && b !== b;
 }
@@ -81,9 +89,11 @@ const transact = (doc: Y.Doc | null, opts: Options, fn: () => void) => {
   }
 };
 
+export const UNDEFINED_YJS_PLACEHOLDER = '__valtio-yjs-undefined__';
+
 const toYValue = (val: any) => {
   if (val === undefined) {
-    return undefined;
+    return UNDEFINED_YJS_PLACEHOLDER;
   }
 
   if (isProxyArray(val)) {
@@ -113,9 +123,21 @@ const toYValue = (val: any) => {
   throw NON_SERIALIZABLE_ERROR;
 };
 
-const toJSON = (yv: unknown) => {
-  if (yv instanceof Y.AbstractType) {
-    return yv.toJSON();
+const toJSON = (yv: unknown): any => {
+  if (yv === UNDEFINED_YJS_PLACEHOLDER) {
+    return undefined;
+  }
+
+  if (yv instanceof Y.Array) {
+    return yv.map((v) => toJSON(v));
+  }
+
+  if (yv instanceof Y.Map) {
+    const obj: Record<string, any> = {};
+    for (const entry of yv.entries()) {
+      obj[entry[0]] = toJSON(entry[1]);
+    }
+    return obj;
   }
 
   return yv;
@@ -313,7 +335,7 @@ function subscribeP<T>(
               if (aOp[0] === 'set' && i < parent.y.length) {
                 return;
               } else {
-                pv = null;
+                pv = undefined;
               }
             }
             if (aOp[0] === 'set') {
