@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.6.3] - 2025-08-08
+
+### Changed
+
+- fix proxy re-assign from Y.Map observe #57
+
 ## [0.6.2] - 2025-08-06
 
 ### Changed
