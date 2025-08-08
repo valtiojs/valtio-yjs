@@ -338,7 +338,10 @@ function subscribeY<T>(y: Y.Map<T> | Y.Array<T>, p: Record<string, T> | T[]) {
           if (item.action === 'delete') {
             delete parent.p[k];
           } else {
-            const yv = parent.y.get(k);
+            const yv = toJSON(parent.y.get(k));
+            if (deepEqual(yv, parent.p[k])) {
+              return;
+            }
             insertYValueToP(yv, parent.p, k);
           }
         });
