@@ -244,4 +244,15 @@ describe('issue #56', () => {
     await Promise.resolve();
     expect(sub).toHaveBeenCalledOnce();
   });
+
+  it('no second assign with undefined', async () => {
+    const doc = new Y.Doc();
+    const p = proxy({ a: { b: 1, c: undefined } });
+    const sub = vi.fn();
+    subscribe(p, sub, true);
+    bind(p, doc.getMap());
+    p.a = { b: 10, c: undefined };
+    await Promise.resolve();
+    expect(sub).toHaveBeenCalledOnce();
+  });
 });
