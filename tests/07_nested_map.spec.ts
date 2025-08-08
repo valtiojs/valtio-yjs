@@ -233,6 +233,6 @@ describe('issue #56', () => {
     bind(p, doc.getMap());
     p.a = { b: 10, c: 20 };
     await Promise.resolve();
-    expect(sub).toHaveBeenCalledOnce()
+    expect(sub).toHaveBeenCalledOnce();
   });
 });

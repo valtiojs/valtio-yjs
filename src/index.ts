@@ -339,7 +339,7 @@ function subscribeY<T>(y: Y.Map<T> | Y.Array<T>, p: Record<string, T> | T[]) {
             delete parent.p[k];
           } else {
             const yv = toJSON(parent.y.get(k));
-            if(deepEqual(yv, parent.p[k])) {
+            if (deepEqual(yv, parent.p[k])) {
               return;
             }
             insertYValueToP(yv, parent.p, k);
