@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.6.4] - 2025-08-09
+
+### Changed
+
+- fix toYValue throws error for undefined #58
+
 ## [0.6.3] - 2025-08-08
 
 ### Changed
