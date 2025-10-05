@@ -7,6 +7,7 @@ import { parseProxyOps } from './parseProxyOps.js';
 const NON_SERIALIZABLE_ERROR = new Error('Proxy type must be serializable');
 
 function deepEqual(a: any, b: any) {
+  let length: number;
   // Adapted from
   // https://github.com/epoberezkin/fast-deep-equal/blob/a8e7172/src/index.jst
   if (a === b) return true;
