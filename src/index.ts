@@ -7,7 +7,6 @@ import { parseProxyOps } from './parseProxyOps.js';
 const NON_SERIALIZABLE_ERROR = new Error('Proxy type must be serializable');
 
 function deepEqual(a: any, b: any) {
-  let length: number;
   // Adapted from
   // https://github.com/epoberezkin/fast-deep-equal/blob/a8e7172/src/index.jst
   if (a === b) return true;
@@ -16,7 +15,7 @@ function deepEqual(a: any, b: any) {
     if (a.constructor !== b.constructor) return false;
 
     if (Array.isArray(a)) {
-      length = a.length;
+      const length = a.length;
       if (length != b.length) return false;
       for (let i = length; i-- !== 0; )
         if (!deepEqual(a[i], b[i])) return false;
@@ -31,7 +30,7 @@ function deepEqual(a: any, b: any) {
       return a.toString() === b.toString();
 
     const keys: string[] = Object.keys(a);
-    length = keys.length;
+    const length = keys.length;
     if (length !== Object.keys(b).length) return false;
 
     for (let i = length; i-- !== 0; )
