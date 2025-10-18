@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.6.5] - 2025-10-18
+
+### Changed
+
+- Fixed length var bug #63
+
 ## [0.6.4] - 2025-08-09
 
 ### Changed
