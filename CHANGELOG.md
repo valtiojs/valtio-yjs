@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Update Valtio v2.3.0
+
 ## [0.6.5] - 2025-10-18
 
 ### Changed

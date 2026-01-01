@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import * as Y from 'yjs';
-import { proxy, subscribe } from 'valtio/vanilla';
+import {
+  unstable_enableOp as enableOp,
+  proxy,
+  subscribe,
+} from 'valtio/vanilla';
+
+enableOp(true);
 
 describe('push', () => {
   it('y array', async () => {

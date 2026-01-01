@@ -1,8 +1,14 @@
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 
 import { describe, expect, it } from 'vitest';
-import { proxy, subscribe } from 'valtio/vanilla';
+import {
+  unstable_enableOp as enableOp,
+  proxy,
+  subscribe,
+} from 'valtio/vanilla';
 import { parseProxyOps } from '../src/parseProxyOps.js';
+
+enableOp(true);
 
 describe('single operation', () => {
   it('push', async () => {
