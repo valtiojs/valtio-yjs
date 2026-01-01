@@ -1,8 +1,14 @@
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 
-import { subscribe, getVersion } from 'valtio/vanilla';
+import {
+  unstable_enableOp as enableOp,
+  subscribe,
+  getVersion,
+} from 'valtio/vanilla';
 import * as Y from 'yjs';
 import { parseProxyOps } from './parseProxyOps.js';
+
+enableOp(true);
 
 const NON_SERIALIZABLE_ERROR = new Error('Proxy type must be serializable');
 

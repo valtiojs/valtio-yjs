@@ -84,8 +84,8 @@ importers:
         specifier: ^8.39.0
         version: 8.39.0(eslint@9.32.0)(typescript@5.9.2)
       valtio:
-        specifier: ^2.1.5
-        version: 2.1.5(@types/react@19.1.9)(react@19.1.1)
+        specifier: ^2.3.0
+        version: 2.3.0(@types/react@19.1.9)(react@19.1.1)
       valtio-yjs:
         specifier: 'link:'
         version: 'link:'
@@ -2340,8 +2340,8 @@ packages:
     resolution: {integrity: sha512-6Z7Ma2aVEWisaL6TvBCy7P8rm2LQoPv6dJ7ecIaIixHcwfbJ0x7mWdbcwlIM5IGQxPZSFYeqRCqlOOeKoJYMkw==}
     engines: {node: '>= 4'}
 
-  valtio@2.1.5:
-    resolution: {integrity: sha512-vsh1Ixu5mT0pJFZm+Jspvhga5GzHUTYv0/+Th203pLfh3/wbHwxhu/Z2OkZDXIgHfjnjBns7SN9HNcbDvPmaGw==}
+  valtio@2.3.0:
+    resolution: {integrity: sha512-1MfKNcmOIdBSatiJsYgw420n6jnD+jeoI0V+RkOQbCB0ElLh6GKUfPr0hc9uq/KBGeghivDEarRsKFFdSQQnKw==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=18.0.0'
@@ -5011,7 +5011,7 @@ snapshots:
 
   utility-types@3.11.0: {}
 
-  valtio@2.1.5(@types/react@19.1.9)(react@19.1.1):
+  valtio@2.3.0(@types/react@19.1.9)(react@19.1.1):
     dependencies:
       proxy-compare: 3.0.1
     optionalDependencies:
