@@ -36,7 +36,7 @@ describe('push', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -73,7 +73,7 @@ describe('push', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -124,7 +124,7 @@ describe('push', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -162,7 +162,7 @@ describe('push', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -223,7 +223,7 @@ describe('pop', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -250,7 +250,7 @@ describe('pop', () => {
     a.delete(a.length - 1);
     expect(a.toJSON()).toMatchInlineSnapshot('[]');
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -307,7 +307,7 @@ describe('pop', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -344,7 +344,7 @@ describe('pop', () => {
     await Promise.resolve();
     expect(p).toMatchInlineSnapshot('[]');
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -421,7 +421,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -455,7 +455,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -503,7 +503,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -565,7 +565,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
@@ -646,7 +646,7 @@ describe('unshift', () => {
       ]
     `);
     expect(listener).toMatchInlineSnapshot(`
-      [MockFunction spy] {
+      [MockFunction] {
         "calls": [
           [
             [
